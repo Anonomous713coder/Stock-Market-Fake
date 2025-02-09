@@ -98,7 +98,7 @@
 <body>
 
     <h1>Stock Market Simulation</h1>
-    <p class="info">Hour: <span id="hour">1</span> | Money: $<span id="money">100</span></p>
+    <p class="info">Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
     <p class="percent-change" id="percent-change">Percent Change: 0%</p>
 
     <div class="container">
@@ -134,7 +134,7 @@
     <p class="headline" id="headline">No news today.</p>
 
     <script>
-        let hour = 1;
+        let day = 1;
         let money = 100;
         let initialPrices = { ACD: 10, JI: 15, DC005: 12.5 };
         let stocks = {
@@ -154,7 +154,7 @@
         }
 
         function updateDisplay() {
-            document.getElementById("hour").innerText = hour;
+            document.getElementById("day").innerText = day;
             document.getElementById("money").innerText = money.toFixed(2);
             document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
             document.getElementById("ji-price").innerText = stocks.JI.price.toFixed(2);
@@ -171,6 +171,9 @@
             let percentChangeDC005 = ((stocks.ACD.percentChange + stocks.JI.percentChange) / 2).toFixed(2);
 
             document.getElementById("percent-change").innerText = `Percent Change: ACD: ${percentChangeACD.toFixed(2)}%, JI: ${percentChangeJI.toFixed(2)}%, D&C 005: ${percentChangeDC005}%`;
+
+            // Announce percent change via speech
+            speak(`Percent Change for today. ACD: ${percentChangeACD.toFixed(2)} percent, JI: ${percentChangeJI.toFixed(2)} percent, D&C 005: ${percentChangeDC005}%`);
 
             updateChart();
         }
@@ -191,10 +194,10 @@
             }
         }
 
-        function nextHour() {
-            hour++;
+        function nextDay() {
+            day++;
 
-            // Calculate new price for ACD and JI with random price fluctuations
+            // Simulate stock price changes
             let changeACD = (Math.random() * 4 - 2);
             let changeJI = (Math.random() * 4 - 2);
 
@@ -238,7 +241,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Hour'
+                            text: 'Day'
                         }
                     },
                     y: {
@@ -252,14 +255,14 @@
         });
 
         function updateChart() {
-            stockChart.data.labels.push(hour);
+            stockChart.data.labels.push(day);
             stockChart.data.datasets[0].data.push(stocks.ACD.price);
             stockChart.data.datasets[1].data.push(stocks.JI.price);
             stockChart.data.datasets[2].data.push(stocks.DC005.price);
             stockChart.update();
         }
 
-        setInterval(nextHour, 10000); // 10 seconds = 1 hour
+        setInterval(nextDay, 10000); // 10 seconds = 1 day
         updateDisplay();
     </script>
 </body>
