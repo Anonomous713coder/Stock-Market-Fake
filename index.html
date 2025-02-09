@@ -1,282 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Market Simulation</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f6f9;
-            color: #2c3e50;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        h1 {
-            color: #34495e;
-            margin-bottom: 10px;
-        }
-        .container {
-            display: flex;
-            justify-content: space-evenly;
-            width: 100%;
-            max-width: 1400px;
-            margin: 20px;
-        }
-        .stock-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        .stock {
-            background: #ffffff;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            padding: 15px;
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-        }
-        .stock h2 {
-            font-size: 18px;
-            color: #2980b9;
-        }
-        .stock p {
-            font-size: 14px;
-            color: #34495e;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 10px;
-            font-size: 14px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .headline {
-            font-weight: bold;
-            font-size: 18px;
-            color: #e74c3c;
-            margin-top: 20px;
-        }
-        canvas {
-            background: white;
-            border-radius: 10px;
-            max-width: 1000px;
-            width: 100%;
-            height: 500px;
-            margin-top: 30px;
-        }
-        .info {
-            font-size: 18px;
-            color: #34495e;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exciting Stock Market Simulation</title>
+  <!-- Updated Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #34495e;
+    }
+    .info {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .save-load-buttons {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .save-load-buttons button {
+      margin: 0 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    /* A scrollable container for stocks */
+    .stock-container {
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: #ecf0f1;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .stock {
+      background: #fff;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+    }
+    .scroll-buttons {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      display: flex;
+      flex-direction: column;
+    }
+    .scroll-buttons button {
+      margin: 2px 0;
+      padding: 5px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .chart-container {
+      max-width: 850px;  /* Chart is 15% smaller than a larger 1000px version */
+      margin: 20px auto;
+    }
+    .headline {
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      color: #e74c3c;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-
-    <h1>Stock Market Simulation</h1>
-    <p class="info">Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
-
-    <div class="container">
-        <div class="stock-container">
-            <div class="stock">
-                <h2>JI - Jacob Intercorps</h2>
-                <p>Price: $<span id="ji-price">15</span></p>
-                <p>Owned: <span id="ji-owned">0</span></p>
-                <p>Total Spent: $<span id="ji-spent">0</span></p>
-                <button onclick="buyStock('JI')">Buy</button>
-                <button onclick="sellStock('JI')">Sell</button>
-            </div>
-            <div class="stock">
-                <h2>GNL - Galactic Neo Labs</h2>
-                <p>Price: $<span id="gnl-price">25</span></p>
-                <p>Owned: <span id="gnl-owned">0</span></p>
-                <p>Total Spent: $<span id="gnl-spent">0</span></p>
-                <button onclick="buyStock('GNL')">Buy</button>
-                <button onclick="sellStock('GNL')">Sell</button>
-            </div>
-            <div class="stock">
-                <h2>D&C 005 - Market Index</h2>
-                <p>Price: $<span id="dc-price">20</span></p>
-                <p>Owned: <span id="dc-owned">0</span></p>
-                <p>Total Spent: $<span id="dc-spent">0</span></p>
-                <button onclick="buyStock('DC')">Buy</button>
-                <button onclick="sellStock('DC')">Sell</button>
-            </div>
-            <div class="stock">
-                <h2>SCC - Shashwat Curry Company</h2>
-                <p>Price: $<span id="scc-price">30</span></p>
-                <p>Owned: <span id="scc-owned">0</span></p>
-                <p>Total Spent: $<span id="scc-spent">0</span></p>
-                <button onclick="buyStock('SCC')">Buy</button>
-                <button onclick="sellStock('SCC')">Sell</button>
-            </div>
-            <div class="stock">
-                <h2>CCPC - Carly Cute Plushy Company</h2>
-                <p>Price: $<span id="ccpc-price">22</span></p>
-                <p>Owned: <span id="ccpc-owned">0</span></p>
-                <p>Total Spent: $<span id="ccpc-spent">0</span></p>
-                <button onclick="buyStock('CCPC')">Buy</button>
-                <button onclick="sellStock('CCPC')">Sell</button>
-            </div>
-        </div>
-        <canvas id="stockChart"></canvas>
+  <h1>Exciting Stock Market Simulation</h1>
+  <div class="info">
+    Day: <span id="day">1</span> | Money: $<span id="money">100</span>
+  </div>
+  <div class="save-load-buttons">
+    <button onclick="saveGame()">Save Game</button>
+    <button onclick="loadGame()">Load Game</button>
+  </div>
+  <div class="container">
+    <!-- Stocks list in a scrollable container -->
+    <div class="stock-container" id="stockList">
+      <div class="scroll-buttons">
+        <button onclick="scrollUp()">▲</button>
+        <button onclick="scrollDown()">▼</button>
+      </div>
+      <!-- Stock Card: JI -->
+      <div class="stock" id="stock-JI">
+        <h2>JI - Jacob Intercorps</h2>
+        <p>Price: $<span id="ji-price">15</span></p>
+        <p>Owned: <span id="ji-owned">0</span></p>
+        <p>Total Spent: $<span id="ji-spent">0</span></p>
+        <button onclick="buyStock('JI')">Buy</button>
+        <button onclick="sellStock('JI')">Sell</button>
+      </div>
+      <!-- Stock Card: GNL -->
+      <div class="stock" id="stock-GNL">
+        <h2>GNL - Galactic Neo Labs</h2>
+        <p>Price: $<span id="gnl-price">25</span></p>
+        <p>Owned: <span id="gnl-owned">0</span></p>
+        <p>Total Spent: $<span id="gnl-spent">0</span></p>
+        <button onclick="buyStock('GNL')">Buy</button>
+        <button onclick="sellStock('GNL')">Sell</button>
+      </div>
+      <!-- Stock Card: D&C 005 -->
+      <div class="stock" id="stock-DC">
+        <h2>D&C 005 - Market Index</h2>
+        <p>Price: $<span id="dc-price">20</span></p>
+        <p>Owned: <span id="dc-owned">0</span></p>
+        <p>Total Spent: $<span id="dc-spent">0</span></p>
+        <button onclick="buyStock('DC')">Buy</button>
+        <button onclick="sellStock('DC')">Sell</button>
+      </div>
+      <!-- Stock Card: SCC -->
+      <div class="stock" id="stock-SCC">
+        <h2>SCC - Shashwat Curry Company</h2>
+        <p>Price: $<span id="scc-price">10</span></p>
+        <p>Owned: <span id="scc-owned">0</span></p>
+        <p>Total Spent: $<span id="scc-spent">0</span></p>
+        <button onclick="buyStock('SCC')">Buy</button>
+        <button onclick="sellStock('SCC')">Sell</button>
+      </div>
+      <!-- Stock Card: CCPC -->
+      <div class="stock" id="stock-CCPC">
+        <h2>CCPC - Carly Cute Plushy Company</h2>
+        <p>Price: $<span id="ccpc-price">18</span></p>
+        <p>Owned: <span id="ccpc-owned">0</span></p>
+        <p>Total Spent: $<span id="ccpc-spent">0</span></p>
+        <button onclick="buyStock('CCPC')">Buy</button>
+        <button onclick="sellStock('CCPC')">Sell</button>
+      </div>
     </div>
+    <!-- Chart Container -->
+    <div class="chart-container">
+      <canvas id="stockChart"></canvas>
+    </div>
+  </div>
+  <p class="headline" id="headline">No news today.</p>
 
-    <p class="headline" id="headline">No news today.</p>
+  <script>
+    /***** Simulation State *****/
+    let day = 1;
+    let money = 100;
+    let stocks = {
+      JI: { price: 15, owned: 0, spent: 0 },
+      GNL: { price: 25, owned: 0, spent: 0 },
+      DC: { price: 20, owned: 0, spent: 0 },
+      SCC: { price: 10, owned: 0, spent: 0 },
+      CCPC: { price: 18, owned: 0, spent: 0 }
+    };
 
-    <script>
-        let day = 1;
-        let money = 100;
-        let stockData = {
-            JI: { price: 15, owned: 0, spent: 0, dividendRate: 0.05 },
-            GNL: { price: 25, owned: 0, spent: 0, dividendRate: 0.08 },
-            DC: { price: 20, owned: 0, spent: 0, dividendRate: 0.04 },
-            SCC: { price: 30, owned: 0, spent: 0, dividendRate: 0.06 },
-            CCPC: { price: 22, owned: 0, spent: 0, dividendRate: 0.07 }
-        };
-        let headlines = [
-            "Tech breakthrough boosts GNL!",
-            "Government contract awarded to JI!",
-            "Stock market shows stable growth.",
-            "Economic uncertainty causes fluctuations.",
-            "Investor confidence skyrockets!",
-            "Regulatory issues affect major stocks.",
-            "GNL announces space colonization plans!",
-            "JI secures major international deal!",
-            "Major cyberattack disrupts market!",
-            "New energy discovery revolutionizes industry!",
-            "SCC expands to new markets!",
-            "CCPC releases highly anticipated plushy collection!"
-        ];
+    // Headlines are objects with text and an "impact" on stocks.
+    // For brevity, only a subset is listed.
+    let headlines = [
+      { text: "SCC opens its first international restaurant!", impact: { SCC: 5 } },
+      { text: "New chicken dish goes viral – SCC stock soars.", impact: { SCC: 8 } },
+      { text: "SCC partners with a major fast food chain for expansion.", impact: { SCC: 10 } },
+      { text: "Supply chain disruption leads to increased costs for SCC.", impact: { SCC: -3 } },
+      { text: "JI acquires a leading tech company, boosting its stock.", impact: { JI: 6 } },
+      { text: "JI faces a cyberattack, causing a temporary dip.", impact: { JI: -4 } },
+      { text: "GNL announces breakthrough in space mining technology.", impact: { GNL: 15 } },
+      { text: "GNL faces funding issues delaying its Mars project.", impact: { GNL: -7 } },
+      { text: "Global market stability boosts D&C 005's value.", impact: { DC: 5 } },
+      { text: "D&C 005 dips after global recession fears hit.", impact: { DC: -4 } },
+      { text: "CCPC releases limited-edition plushies, creating buzz.", impact: { CCPC: 10 } },
+      { text: "CCPC's production delay hurts its stock.", impact: { CCPC: -6 } },
+      // Rare market crash event (1/10000 chance)
+      { text: "A global market crash leads to significant drops across the board.", impact: { JI: -10, GNL: -10, DC: -10, SCC: -10, CCPC: -10 } }
+    ];
 
-        let chartData = {
-            labels: [],
-            datasets: [
-                {
-                    label: 'Stock Price Over Time',
-                    data: [],
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    fill: false,
-                }
-            ]
-        };
+    /***** Chart.js Setup *****/
+    const ctx = document.getElementById('stockChart').getContext('2d');
+    let chartData = {
+      labels: [`Day ${day}`],
+      datasets: [
+        { label: 'JI - Jacob Intercorps', data: [stocks.JI.price], borderColor: 'blue', fill: false },
+        { label: 'GNL - Galactic Neo Labs', data: [stocks.GNL.price], borderColor: 'orange', fill: false },
+        { label: 'D&C 005', data: [stocks.DC.price], borderColor: 'green', fill: false },
+        { label: 'SCC - Shashwat Curry Company', data: [stocks.SCC.price], borderColor: 'red', fill: false },
+        { label: 'CCPC - Carly Cute Plushy Company', data: [stocks.CCPC.price], borderColor: 'purple', fill: false }
+      ]
+    };
+    let chartOptions = {
+      responsive: true,
+      scales: {
+        x: { title: { display: true, text: 'Day' } },
+        y: { title: { display: true, text: 'Price ($)' } }
+      }
+    };
+    let stockChart = new Chart(ctx, { type: 'line', data: chartData, options: chartOptions });
 
-        const ctx = document.getElementById('stockChart').getContext('2d');
-        const stockChart = new Chart(ctx, {
-            type: 'line',
-            data: chartData,
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
-                },
-                scales: {
-                    x: { 
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Days'
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Stock Value'
-                        }
-                    }
-                }
-            }
-        });
+    /***** UI Update Functions *****/
+    // Update stock cards with current prices, ownership, and spent amounts.
+    function updateStockDisplay() {
+      document.getElementById('ji-price').innerText = stocks.JI.price;
+      document.getElementById('gnl-price').innerText = stocks.GNL.price;
+      document.getElementById('dc-price').innerText = stocks.DC.price;
+      document.getElementById('scc-price').innerText = stocks.SCC.price;
+      document.getElementById('ccpc-price').innerText = stocks.CCPC.price;
+      document.getElementById('ji-owned').innerText = stocks.JI.owned;
+      document.getElementById('gnl-owned').innerText = stocks.GNL.owned;
+      document.getElementById('dc-owned').innerText = stocks.DC.owned;
+      document.getElementById('scc-owned').innerText = stocks.SCC.owned;
+      document.getElementById('ccpc-owned').innerText = stocks.CCPC.owned;
+      document.getElementById('ji-spent').innerText = stocks.JI.spent;
+      document.getElementById('gnl-spent').innerText = stocks.GNL.spent;
+      document.getElementById('dc-spent').innerText = stocks.DC.spent;
+      document.getElementById('scc-spent').innerText = stocks.SCC.spent;
+      document.getElementById('ccpc-spent').innerText = stocks.CCPC.spent;
+    }
+    // Update the chart with the new day's prices.
+    function updateGraph() {
+      chartData.labels.push(`Day ${day}`);
+      chartData.datasets[0].data.push(stocks.JI.price);
+      chartData.datasets[1].data.push(stocks.GNL.price);
+      chartData.datasets[2].data.push(stocks.DC.price);
+      chartData.datasets[3].data.push(stocks.SCC.price);
+      chartData.datasets[4].data.push(stocks.CCPC.price);
+      stockChart.update();
+    }
 
-        function updateNews() {
-            let headline = headlines[Math.floor(Math.random() * headlines.length)];
-            document.getElementById("headline").innerText = headline;
-            let speech = new SpeechSynthesisUtterance(headline);
-            speechSynthesis.speak(speech);
-        }
+    /***** Simulated API Call *****/
+    // Simulate an API call that returns updated stock prices based on a news event.
+    function fetchPriceUpdate(news) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          let newPrices = {};
+          Object.keys(stocks).forEach(stock => {
+            // Apply the news impact if defined plus a random volatility (-1, 0, or 1).
+            let impact = news.impact[stock] || 0;
+            let randomVolatility = Math.floor(Math.random() * 3) - 1;
+            newPrices[stock] = stocks[stock].price + impact + randomVolatility;
+            if (newPrices[stock] < 0) newPrices[stock] = 0;
+          });
+          resolve(newPrices);
+        }, 500); // Simulated API delay
+      });
+    }
 
-        function updateDisplay() {
-            document.getElementById("day").innerText = day;
-            document.getElementById("money").innerText = money.toFixed(2);
-            
-            for (let stock in stockData) {
-                document.getElementById(stock.toLowerCase() + "-price").innerText = stockData[stock].price;
-                document.getElementById(stock.toLowerCase() + "-owned").innerText = stockData[stock].owned;
-                document.getElementById(stock.toLowerCase() + "-spent").innerText = stockData[stock].spent;
-            }
+    /***** News and Price Update *****/
+    // Apply a random news event and update prices via the simulated API.
+    async function applyNews() {
+      // Randomly choose a news event.
+      let news = headlines[Math.floor(Math.random() * headlines.length)];
+      // Check for the rare market crash (1/10000 chance).
+      if (Math.random() < 0.0001) {
+        news = headlines.find(h => h.text.includes("market crash"));
+      }
+      document.getElementById('headline').innerText = news.text;
+      let newPrices = await fetchPriceUpdate(news);
+      Object.keys(newPrices).forEach(stock => {
+        stocks[stock].price = newPrices[stock];
+      });
+      updateStockDisplay();
+    }
 
-            // Update chart data
-            chartData.labels.push(day);
-            chartData.datasets[0].data.push(stockData.JI.price); // Change this to include other stocks as needed
+    /***** Simulation Next Day *****/
+    // Move to the next day: update day counter, apply news, update the chart.
+    async function nextDay() {
+      day++;
+      document.getElementById('day').innerText = day;
+      await applyNews();
+      updateGraph();
+    }
+    // Automatically simulate the next day every 5 seconds.
+    setInterval(nextDay, 5000);
 
-            stockChart.update();
-        }
+    /***** Stock Buying & Selling *****/
+    function buyStock(stock) {
+      let price = stocks[stock].price;
+      if (money >= price) {
+        stocks[stock].owned++;
+        money -= price;
+        stocks[stock].spent += price;
+        updateStockDisplay();
+        document.getElementById('money').innerText = money;
+      } else {
+        alert("Not enough money to buy!");
+      }
+    }
+    function sellStock(stock) {
+      if (stocks[stock].owned > 0) {
+        let price = stocks[stock].price;
+        stocks[stock].owned--;
+        money += price;
+        stocks[stock].spent -= price;
+        updateStockDisplay();
+        document.getElementById('money').innerText = money;
+      } else {
+        alert("No stocks to sell!");
+      }
+    }
 
-        function distributeDividends() {
-            let totalDividends = 0;
-            for (let stock in stockData) {
-                totalDividends += stockData[stock].owned * stockData[stock].price * stockData[stock].dividendRate;
-            }
-            money += totalDividends;
-        }
+    /***** Scroll Buttons for Stock List *****/
+    function scrollUp() {
+      let container = document.getElementById('stockList');
+      container.scrollBy({ top: -50, behavior: 'smooth' });
+    }
+    function scrollDown() {
+      let container = document.getElementById('stockList');
+      container.scrollBy({ top: 50, behavior: 'smooth' });
+    }
 
-        function nextDay() {
-            day++;
-            distributeDividends();
-            updateNews();
-            updateDisplay();
-        }
-
-        setInterval(nextDay, 5000);
-
-        // Stock buying and selling logic
-        function buyStock(stock) {
-            if (money >= stockData[stock].price) {
-                stockData[stock].owned++;
-                money -= stockData[stock].price;
-                stockData[stock].spent += stockData[stock].price;
-            }
-        }
-
-        function sellStock(stock) {
-            if (stockData[stock].owned > 0) {
-                stockData[stock].owned--;
-                money += stockData[stock].price;
-                stockData[stock].spent -= stockData[stock].price;
-            }
-        }
-
-        updateDisplay();
-    </script>
+    /***** Save/Load Game Feature *****/
+    function saveGame() {
+      const gameState = {
+        day,
+        money,
+        stocks,
+        chartData
+      };
+      localStorage.setItem('stockGameSave', JSON.stringify(gameState));
+      alert("Game saved!");
+    }
+    function loadGame() {
+      const savedState = localStorage.getItem('stockGameSave');
+      if (savedState) {
+        const gameState = JSON.parse(savedState);
+        day = gameState.day;
+        money = gameState.money;
+        stocks = gameState.stocks;
+        chartData = gameState.chartData;
+        document.getElementById('day').innerText = day;
+        document.getElementById('money').innerText = money;
+        updateStockDisplay();
+        stockChart.data = chartData;
+        stockChart.update();
+        alert("Game loaded!");
+      } else {
+        alert("No saved game found!");
+      }
+    }
+  </script>
 </body>
 </html>
-
-
 
 
 
