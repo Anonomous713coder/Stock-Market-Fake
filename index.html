@@ -11,44 +11,25 @@
             background-color: #f4f6f9;
             color: #2c3e50;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            padding: 20px;
+            text-align: center;
         }
         h1 {
             color: #34495e;
-            margin-bottom: 10px;
         }
         .container {
             display: flex;
-            justify-content: space-evenly;
-            width: 100%;
-            max-width: 1200px;
-            margin: 20px;
+            justify-content: space-around;
+            margin-top: 20px;
         }
         .stock-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 250px;
-        }
-        .stock {
-            background: #ffffff;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            background: white;
             padding: 15px;
+            border-radius: 8px;
             box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
-            width: 100%;
         }
         .stock h2 {
-            font-size: 18px;
             color: #2980b9;
         }
         .stock p {
@@ -65,14 +46,13 @@
             cursor: pointer;
             width: 100%;
             margin-top: 10px;
-            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #2980b9;
         }
-        .headline {
-            font-weight: bold;
+        .news {
             font-size: 18px;
+            font-weight: bold;
             color: #e74c3c;
             margin-top: 20px;
         }
@@ -84,76 +64,64 @@
             height: 400px;
             margin-top: 30px;
         }
-        .info {
-            font-size: 18px;
-            color: #34495e;
-        }
-        .percent-change {
-            font-size: 16px;
-            color: #16a085;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
 
     <h1>Stock Market Simulation</h1>
-    <p class="info">Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
-    <p class="percent-change" id="percent-change">Percent Change: 0%</p>
+    <p>Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
+    <p id="percent-change">Percent Change: 0%</p>
 
     <div class="container">
         <div class="stock-container">
-            <div class="stock">
-                <h2>ACD - American Chicken Department</h2>
-                <p>Price: $<span id="acd-price">10</span></p>
-                <p>Owned: <span id="acd-owned">0</span></p>
-                <button onclick="buyStock('ACD')">Buy</button>
-                <button onclick="sellStock('ACD')">Sell</button>
-            </div>
-
-            <div class="stock">
-                <h2>JI - Jacob Intercorps</h2>
-                <p>Price: $<span id="ji-price">15</span></p>
-                <p>Owned: <span id="ji-owned">0</span></p>
-                <button onclick="buyStock('JI')">Buy</button>
-                <button onclick="sellStock('JI')">Sell</button>
-            </div>
-
-            <div class="stock">
-                <h2>D&C 005</h2>
-                <p>Price: $<span id="dc005-price">12.5</span></p>
-                <p>Owned: <span id="dc005-owned">0</span></p>
-                <button onclick="buyStock('DC005')">Buy</button>
-                <button onclick="sellStock('DC005')">Sell</button>
-            </div>
+            <h2>ACD - American Chicken Department</h2>
+            <p>Price: $<span id="acd-price">10</span></p>
+            <p>Owned: <span id="acd-owned">0</span></p>
+            <button onclick="buyStock('ACD')">Buy</button>
+            <button onclick="sellStock('ACD')">Sell</button>
         </div>
 
-        <canvas id="stockChart"></canvas>
+        <div class="stock-container">
+            <h2>JI - Jacob Intercorps</h2>
+            <p>Price: $<span id="ji-price">15</span></p>
+            <p>Owned: <span id="ji-owned">0</span></p>
+            <button onclick="buyStock('JI')">Buy</button>
+            <button onclick="sellStock('JI')">Sell</button>
+        </div>
+
+        <div class="stock-container">
+            <h2>D&C 005</h2>
+            <p>Price: $<span id="dc005-price">12.5</span></p>
+            <p>Owned: <span id="dc005-owned">0</span></p>
+            <button onclick="buyStock('DC005')">Buy</button>
+            <button onclick="sellStock('DC005')">Sell</button>
+        </div>
     </div>
 
-    <p class="headline" id="headline">No news today.</p>
+    <canvas id="stockChart"></canvas>
+
+    <p class="news" id="news">No news today.</p>
 
     <script>
         let day = 1;
         let money = 100;
-        let initialPrices = { ACD: 10, JI: 15, DC005: 12.5 };
         let stocks = {
-            ACD: { price: 10, owned: 0, history: [], percentChange: 0, previousPrice: 10 },
-            JI: { price: 15, owned: 0, history: [], percentChange: 0, previousPrice: 15 },
-            DC005: { price: 12.5, owned: 0, history: [], percentChange: 0, previousPrice: 12.5 } // D&C 005 initialized
+            ACD: { price: 10, owned: 0, history: [], previousPrice: 10 },
+            JI: { price: 15, owned: 0, history: [], previousPrice: 15 },
+            DC005: { price: 12.5, owned: 0, history: [], previousPrice: 12.5 }
         };
 
         let headlines = [
             { text: "Chicken prices soar!", effect: { ACD: 5 } },
-            { text: "Fart gas shortage impacts JI!", effect: { JI: -5 } },
-            { text: "Stock market stable.", effect: {} },
-            { text: "Chicken farm disaster!", effect: { ACD: -10 } },
-            { text: "Massive government contract for JI!", effect: { JI: 10 } },
-            { text: "Massive drought hits chicken production!", effect: { ACD: -15 } },
-            { text: "JI's new fart technology boosts stocks!", effect: { JI: 8 } }
+            { text: "Jacob Intercorps launches new AI tech!", effect: { JI: 10 } },
+            { text: "D&C 005 gains investor confidence!", effect: { DC005: 7 } },
+            { text: "Farm disease spreads, impacting ACD!", effect: { ACD: -8 } },
+            { text: "Global market crash hits JI stocks!", effect: { JI: -12 } },
+            { text: "Massive government contract for Jacob Intercorps!", effect: { JI: 15 } },
+            { text: "Drought leads to a chicken shortage!", effect: { ACD: -10 } },
+            { text: "Tech boom fuels rapid growth in JI!", effect: { JI: 12 } }
         ];
 
-        // Speech synthesis function
         function speak(text) {
             const speech = new SpeechSynthesisUtterance(text);
             speech.lang = 'en-US';
@@ -169,21 +137,7 @@
             document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
             document.getElementById("ji-price").innerText = stocks.JI.price.toFixed(2);
             document.getElementById("dc005-price").innerText = stocks.DC005.price.toFixed(2);
-            document.getElementById("acd-owned").innerText = stocks.ACD.owned;
-            document.getElementById("ji-owned").innerText = stocks.JI.owned;
-            document.getElementById("dc005-owned").innerText = stocks.DC005.owned;
-
-            // Calculate percent change for ACD, JI, and D&C 005
-            let percentChangeACD = ((stocks.ACD.price - stocks.ACD.previousPrice) / stocks.ACD.previousPrice) * 100;
-            let percentChangeJI = ((stocks.JI.price - stocks.JI.previousPrice) / stocks.JI.previousPrice) * 100;
-
-            // Average percent change for D&C 005
-            let percentChangeDC005 = ((stocks.ACD.percentChange + stocks.JI.percentChange) / 2).toFixed(2);
-
-            document.getElementById("percent-change").innerText = `Percent Change: ACD: ${percentChangeACD.toFixed(2)}%, JI: ${percentChangeJI.toFixed(2)}%, D&C 005: ${percentChangeDC005}%`;
-
-            // Announce percent change via speech
-            speak(`Percent Change for today. ACD: ${percentChangeACD.toFixed(2)} percent, JI: ${percentChangeJI.toFixed(2)} percent, D&C 005: ${percentChangeDC005}%`);
+            document.getElementById("percent-change").innerText = `Percent Change: ACD: ${(stocks.ACD.price - stocks.ACD.previousPrice).toFixed(2)}%, JI: ${(stocks.JI.price - stocks.JI.previousPrice).toFixed(2)}%, D&C 005: ${(stocks.DC005.price - stocks.DC005.previousPrice).toFixed(2)}%`;
 
             updateChart();
         }
@@ -207,33 +161,18 @@
         function nextDay() {
             day++;
 
-            // Update the prices with random effect from news headlines
-            let randomHeadline = headlines[Math.floor(Math.random() * headlines.length)];
-            let headlineText = randomHeadline.text;
-            let headlineEffect = randomHeadline.effect;
+            let randomNews = headlines[Math.floor(Math.random() * headlines.length)];
+            document.getElementById("news").innerText = randomNews.text;
+            speak(randomNews.text);
 
-            // Apply effect from headline to stocks
-            if (headlineEffect.ACD) {
-                stocks.ACD.price += headlineEffect.ACD;
-            }
-            if (headlineEffect.JI) {
-                stocks.JI.price += headlineEffect.JI;
-            }
+            if (randomNews.effect.ACD) stocks.ACD.price += randomNews.effect.ACD;
+            if (randomNews.effect.JI) stocks.JI.price += randomNews.effect.JI;
 
-            // D&C 005 Price is the average of ACD and JI prices
             stocks.DC005.price = (stocks.ACD.price + stocks.JI.price) / 2;
 
-            // Update percent change for each stock
-            stocks.ACD.percentChange = ((stocks.ACD.price - stocks.ACD.previousPrice) / stocks.ACD.previousPrice) * 100;
-            stocks.JI.percentChange = ((stocks.JI.price - stocks.JI.previousPrice) / stocks.JI.previousPrice) * 100;
-
-            // Announce news headline
-            document.getElementById("headline").innerText = headlineText;
-            speak(headlineText);
-
-            // Update previous prices for the next day's calculation
             stocks.ACD.previousPrice = stocks.ACD.price;
             stocks.JI.previousPrice = stocks.JI.price;
+            stocks.DC005.previousPrice = stocks.DC005.price;
 
             updateDisplay();
         }
@@ -241,47 +180,22 @@
         let ctx = document.getElementById("stockChart").getContext("2d");
         let stockChart = new Chart(ctx, {
             type: "line",
-            data: {
-                labels: [],
-                datasets: [
-                    { label: "ACD Price", borderColor: "blue", fill: false, data: [] },
-                    { label: "JI Price", borderColor: "green", fill: false, data: [] },
-                    { label: "D&C 005 Price", borderColor: "orange", fill: false, data: [] }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Day'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Stock Price ($)'
-                        }
-                    }
-                }
-            }
+            data: { labels: [], datasets: [{ label: "ACD", borderColor: "blue", data: [] }, { label: "JI", borderColor: "green", data: [] }, { label: "D&C 005", borderColor: "orange", data: [] }] },
+            options: { scales: { x: { title: { display: true, text: 'Day' } }, y: { title: { display: true, text: 'Stock Price ($)' } } } }
         });
 
         function updateChart() {
             stockChart.data.labels.push(day);
-            stockChart.data.datasets[0].data.push(stocks.ACD.price);
-            stockChart.data.datasets[1].data.push(stocks.JI.price);
-            stockChart.data.datasets[2].data.push(stocks.DC005.price);
+            stockChart.data.datasets.forEach((dataset, index) => dataset.data.push(Object.values(stocks)[index].price));
             stockChart.update();
         }
 
-        setInterval(nextDay, 10000); // 10 seconds = 1 day
-        updateDisplay();
+        setInterval(nextDay, 5000); // 5 seconds = 1 day
     </script>
 
 </body>
 </html>
+
 
 
 
