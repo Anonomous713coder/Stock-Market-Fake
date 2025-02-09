@@ -134,17 +134,28 @@
             FFI: { price: 15, owned: 0, history: [], dividendRate: 0.05 }
         };
         let headlines = [
-            { text: "Chicken prices soar!", effect: { ACD: 5 } },
-            { text: "Fart gas shortage impacts FFI!", effect: { FFI: -5 } },
-            { text: "Stock market stable.", effect: {} },
-            { text: "Chicken farm disaster!", effect: { ACD: -10 } },
-            { text: "Massive government contract for FFI!", effect: { FFI: 10 } },
-            { text: "Market crash!", effect: { ACD: -20, FFI: -20 }, rare: true },
-            { text: "Massive drought hits chicken production!", effect: { ACD: -15 } },
-            { text: "FFI acquires new fart technology!", effect: { FFI: 8 } },
-            { text: "New chicken farming technique boosts profits!", effect: { ACD: 10 } },
-            { text: "FFI signs partnership with top oil company!", effect: { FFI: 12 } }
+            { text: "Chicken prices soar!", effect: { ACD: 5 }, rarity: 0.1 },
+            { text: "Fart gas shortage impacts FFI!", effect: { FFI: -5 }, rarity: 0.1 },
+            { text: "Stock market stable.", effect: {}, rarity: 0.4 },
+            { text: "Chicken farm disaster!", effect: { ACD: -10 }, rarity: 0.05 },
+            { text: "Massive government contract for FFI!", effect: { FFI: 10 }, rarity: 0.1 },
+            { text: "Market crash!", effect: { ACD: -20, FFI: -20 }, rarity: 0.02 },
+            { text: "Massive drought hits chicken production!", effect: { ACD: -15 }, rarity: 0.05 },
+            { text: "FFI acquires new fart technology!", effect: { FFI: 8 }, rarity: 0.1 },
+            { text: "Breakthrough in chicken feed technology!", effect: { ACD: 10 }, rarity: 0.1 },
+            { text: "Global supply chain issues affect FFI!", effect: { FFI: -8 }, rarity: 0.05 },
+            { text: "ACD strikes deal with a major retailer!", effect: { ACD: 7 }, rarity: 0.15 }
         ];
+
+        // Speech synthesis function
+        function speak(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.volume = 1;
+            speech.rate = 1;
+            speech.pitch = 1;
+            speechSynthesis.speak(speech);
+        }
 
         function updateDisplay() {
             document.getElementById("hour").innerText = hour;
@@ -157,8 +168,6 @@
             // Calculate percent change
             let percentChange = ((stocks.ACD.price - initialPrices.ACD) / initialPrices.ACD) * 100;
             document.getElementById("percent-change").innerText = `Percent Change: ${percentChange.toFixed(2)}%`;
-
-            updateChart();
         }
 
         function buyStock(stock) {
@@ -179,11 +188,10 @@
 
         function nextHour() {
             hour++;
-            if (hour > 24) hour = 1; // Reset to 1 when the day ends
-
-            let headlineOptions = headlines.filter(h => !h.rare || Math.random() < 0.001);
+            let headlineOptions = headlines.filter(h => Math.random() < h.rarity);
             let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
             document.getElementById("headline").innerText = headline.text;
+            speak(headline.text); // Add voice for the news
 
             // Apply price changes
             for (let stock in stocks) {
@@ -220,9 +228,6 @@
                         title: {
                             display: true,
                             text: 'Hour'
-                        },
-                        ticks: {
-                            maxTicksLimit: 24
                         }
                     },
                     y: {
@@ -242,10 +247,11 @@
             stockChart.update();
         }
 
-        setInterval(nextHour, 2000); // 2 seconds = 1 hour
+        setInterval(nextHour, 1000); // 1 second = 1 hour
         updateDisplay();
     </script>
 </body>
 </html>
+
 
 
