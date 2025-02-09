@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Exciting Stock Market Simulation</title>
-  <!-- Updated Chart.js CDN -->
+  <!-- Updated Chart.js CDN to v4.3.0 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0"></script>
   <style>
     body {
@@ -38,7 +38,7 @@
       justify-content: center;
       gap: 20px;
     }
-    /* A scrollable container for stocks */
+    /* Scrollable container for stock cards */
     .stock-container {
       width: 300px;
       max-height: 400px;
@@ -70,8 +70,14 @@
       cursor: pointer;
     }
     .chart-container {
-      max-width: 850px;  /* Chart is 15% smaller than a larger 1000px version */
+      max-width: 1000px;  /* Increased width for the graph */
       margin: 20px auto;
+    }
+    canvas {
+      background: white;
+      border-radius: 10px;
+      width: 100%;
+      height: 600px;  /* Increased height */
     }
     .headline {
       text-align: center;
@@ -92,7 +98,7 @@
     <button onclick="loadGame()">Load Game</button>
   </div>
   <div class="container">
-    <!-- Stocks list in a scrollable container -->
+    <!-- Stock Cards Container -->
     <div class="stock-container" id="stockList">
       <div class="scroll-buttons">
         <button onclick="scrollUp()">▲</button>
@@ -163,8 +169,7 @@
       CCPC: { price: 18, owned: 0, spent: 0 }
     };
 
-    // Headlines are objects with text and an "impact" on stocks.
-    // For brevity, only a subset is listed.
+    // Headlines with text and an impact on stocks.
     let headlines = [
       { text: "SCC opens its first international restaurant!", impact: { SCC: 5 } },
       { text: "New chicken dish goes viral – SCC stock soars.", impact: { SCC: 8 } },
@@ -196,6 +201,10 @@
     };
     let chartOptions = {
       responsive: true,
+      plugins: {
+        legend: { display: true, position: 'top' },
+        tooltip: { enabled: true }
+      },
       scales: {
         x: { title: { display: true, text: 'Day' } },
         y: { title: { display: true, text: 'Price ($)' } }
@@ -204,7 +213,6 @@
     let stockChart = new Chart(ctx, { type: 'line', data: chartData, options: chartOptions });
 
     /***** UI Update Functions *****/
-    // Update stock cards with current prices, ownership, and spent amounts.
     function updateStockDisplay() {
       document.getElementById('ji-price').innerText = stocks.JI.price;
       document.getElementById('gnl-price').innerText = stocks.GNL.price;
@@ -222,7 +230,6 @@
       document.getElementById('scc-spent').innerText = stocks.SCC.spent;
       document.getElementById('ccpc-spent').innerText = stocks.CCPC.spent;
     }
-    // Update the chart with the new day's prices.
     function updateGraph() {
       chartData.labels.push(`Day ${day}`);
       chartData.datasets[0].data.push(stocks.JI.price);
@@ -233,14 +240,13 @@
       stockChart.update();
     }
 
-    /***** Simulated API Call *****/
-    // Simulate an API call that returns updated stock prices based on a news event.
+    /***** Simulated API Call for Price Update *****/
     function fetchPriceUpdate(news) {
       return new Promise(resolve => {
         setTimeout(() => {
           let newPrices = {};
           Object.keys(stocks).forEach(stock => {
-            // Apply the news impact if defined plus a random volatility (-1, 0, or 1).
+            // Apply news impact plus random volatility (-1, 0, or 1)
             let impact = news.impact[stock] || 0;
             let randomVolatility = Math.floor(Math.random() * 3) - 1;
             newPrices[stock] = stocks[stock].price + impact + randomVolatility;
@@ -251,16 +257,21 @@
       });
     }
 
-    /***** News and Price Update *****/
-    // Apply a random news event and update prices via the simulated API.
+    /***** News and Price Update with Text-to-Speech *****/
     async function applyNews() {
-      // Randomly choose a news event.
+      // Choose a random news event
       let news = headlines[Math.floor(Math.random() * headlines.length)];
-      // Check for the rare market crash (1/10000 chance).
+      // Check for a rare market crash event (1/10000 chance)
       if (Math.random() < 0.0001) {
         news = headlines.find(h => h.text.includes("market crash"));
       }
+      // Display the news headline
       document.getElementById('headline').innerText = news.text;
+      // Cancel any ongoing speech and speak the current headline
+      speechSynthesis.cancel();
+      let utterance = new SpeechSynthesisUtterance(news.text);
+      speechSynthesis.speak(utterance);
+      // Update prices based on the news via the simulated API
       let newPrices = await fetchPriceUpdate(news);
       Object.keys(newPrices).forEach(stock => {
         stocks[stock].price = newPrices[stock];
@@ -268,15 +279,13 @@
       updateStockDisplay();
     }
 
-    /***** Simulation Next Day *****/
-    // Move to the next day: update day counter, apply news, update the chart.
+    /***** Next Day Simulation *****/
     async function nextDay() {
       day++;
       document.getElementById('day').innerText = day;
       await applyNews();
       updateGraph();
     }
-    // Automatically simulate the next day every 5 seconds.
     setInterval(nextDay, 5000);
 
     /***** Stock Buying & Selling *****/
