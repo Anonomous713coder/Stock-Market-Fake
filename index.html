@@ -98,7 +98,7 @@
 <body>
 
     <h1>Stock Market Simulation</h1>
-    <p class="info">Hour: <span id="hour">1</span> | Money: $<span id="money">100</span></p>
+    <p class="info">Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
     <p class="percent-change" id="percent-change">Percent Change: 0%</p>
 
     <div class="container">
@@ -112,11 +112,11 @@
             </div>
 
             <div class="stock">
-                <h2>FFI - Federal Fart Intercorps</h2>
-                <p>Price: $<span id="ffi-price">15</span></p>
-                <p>Owned: <span id="ffi-owned">0</span></p>
-                <button onclick="buyStock('FFI')">Buy</button>
-                <button onclick="sellStock('FFI')">Sell</button>
+                <h2>JI - Jacob Intercorps</h2>
+                <p>Price: $<span id="ji-price">15</span></p>
+                <p>Owned: <span id="ji-owned">0</span></p>
+                <button onclick="buyStock('JI')">Buy</button>
+                <button onclick="sellStock('JI')">Sell</button>
             </div>
         </div>
 
@@ -126,25 +126,25 @@
     <p class="headline" id="headline">No news today.</p>
 
     <script>
-        let hour = 1;
+        let day = 1;
         let money = 100;
-        let initialPrices = { ACD: 10, FFI: 15 };
+        let initialPrices = { ACD: 10, JI: 15 };
         let stocks = {
             ACD: { price: 10, owned: 0, history: [], dividendRate: 0.1 },
-            FFI: { price: 15, owned: 0, history: [], dividendRate: 0.05 }
+            JI: { price: 15, owned: 0, history: [], dividendRate: 0.05 }
         };
         let headlines = [
             { text: "Chicken prices soar!", effect: { ACD: 5 }, rarity: 0.1 },
-            { text: "Fart gas shortage impacts FFI!", effect: { FFI: -5 }, rarity: 0.1 },
+            { text: "Jacob Intercorps secures major government contract!", effect: { JI: 10 }, rarity: 0.1 },
             { text: "Stock market stable.", effect: {}, rarity: 0.4 },
-            { text: "Chicken farm disaster!", effect: { ACD: -10 }, rarity: 0.05 },
-            { text: "Massive government contract for FFI!", effect: { FFI: 10 }, rarity: 0.1 },
-            { text: "Market crash!", effect: { ACD: -20, FFI: -20 }, rarity: 0.02 },
-            { text: "Massive drought hits chicken production!", effect: { ACD: -15 }, rarity: 0.05 },
-            { text: "FFI acquires new fart technology!", effect: { FFI: 8 }, rarity: 0.1 },
-            { text: "Breakthrough in chicken feed technology!", effect: { ACD: 10 }, rarity: 0.1 },
-            { text: "Global supply chain issues affect FFI!", effect: { FFI: -8 }, rarity: 0.05 },
-            { text: "ACD strikes deal with a major retailer!", effect: { ACD: 7 }, rarity: 0.15 }
+            { text: "Massive food contamination scandal affects ACD!", effect: { ACD: -10 }, rarity: 0.05 },
+            { text: "Jacob Intercorps expands into international markets!", effect: { JI: 12 }, rarity: 0.15 },
+            { text: "Market crash due to unforeseen global events!", effect: { ACD: -20, JI: -20 }, rarity: 0.02 },
+            { text: "Massive drought impacts chicken production!", effect: { ACD: -15 }, rarity: 0.05 },
+            { text: "Jacob Intercorps develops cutting-edge tech!", effect: { JI: 8 }, rarity: 0.1 },
+            { text: "ACD reaches new distribution milestones!", effect: { ACD: 7 }, rarity: 0.1 },
+            { text: "Jacob Intercorps faces labor strikes in major factories.", effect: { JI: -8 }, rarity: 0.1 },
+            { text: "ACD and JI form strategic partnership!", effect: { ACD: 10, JI: 10 }, rarity: 0.05 }
         ];
 
         // Speech synthesis function
@@ -158,12 +158,12 @@
         }
 
         function updateDisplay() {
-            document.getElementById("hour").innerText = hour;
+            document.getElementById("day").innerText = day;
             document.getElementById("money").innerText = money.toFixed(2);
             document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
-            document.getElementById("ffi-price").innerText = stocks.FFI.price.toFixed(2);
+            document.getElementById("ji-price").innerText = stocks.JI.price.toFixed(2);
             document.getElementById("acd-owned").innerText = stocks.ACD.owned;
-            document.getElementById("ffi-owned").innerText = stocks.FFI.owned;
+            document.getElementById("ji-owned").innerText = stocks.JI.owned;
 
             // Calculate percent change
             let percentChange = ((stocks.ACD.price - initialPrices.ACD) / initialPrices.ACD) * 100;
@@ -186,8 +186,8 @@
             }
         }
 
-        function nextHour() {
-            hour++;
+        function nextDay() {
+            day++;
             let headlineOptions = headlines.filter(h => Math.random() < h.rarity);
             let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
             document.getElementById("headline").innerText = headline.text;
@@ -218,7 +218,7 @@
                 labels: [],
                 datasets: [
                     { label: "ACD Price", borderColor: "blue", fill: false, data: [] },
-                    { label: "FFI Price", borderColor: "green", fill: false, data: [] }
+                    { label: "JI Price", borderColor: "green", fill: false, data: [] }
                 ]
             },
             options: {
@@ -227,7 +227,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Hour'
+                            text: 'Day'
                         }
                     },
                     y: {
@@ -241,17 +241,18 @@
         });
 
         function updateChart() {
-            stockChart.data.labels.push(hour);
+            stockChart.data.labels.push(day);
             stockChart.data.datasets[0].data.push(stocks.ACD.price);
-            stockChart.data.datasets[1].data.push(stocks.FFI.price);
+            stockChart.data.datasets[1].data.push(stocks.JI.price);
             stockChart.update();
         }
 
-        setInterval(nextHour, 1000); // 1 second = 1 hour
+        setInterval(nextDay, 10000); // 10 seconds = 1 day
         updateDisplay();
     </script>
 </body>
 </html>
+
 
 
 
