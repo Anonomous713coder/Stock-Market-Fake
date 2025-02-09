@@ -69,15 +69,17 @@
       font-size: 12px;
       cursor: pointer;
     }
+    /* Updated chart container: 3x wider (3000px max-width) */
     .chart-container {
-      max-width: 1000px;  /* Increased width for the graph */
+      max-width: 3000px;
       margin: 20px auto;
     }
+    /* Updated canvas: 2x taller (1200px height) */
     canvas {
       background: white;
       border-radius: 10px;
       width: 100%;
-      height: 600px;  /* Increased height */
+      height: 1200px;
     }
     .headline {
       text-align: center;
@@ -149,6 +151,15 @@
         <button onclick="buyStock('CCPC')">Buy</button>
         <button onclick="sellStock('CCPC')">Sell</button>
       </div>
+      <!-- Stock Card: GPT -->
+      <div class="stock" id="stock-GPT">
+        <h2>GPT - AI Stock</h2>
+        <p>Price: $<span id="gpt-price">50</span></p>
+        <p>Owned: <span id="gpt-owned">0</span></p>
+        <p>Total Spent: $<span id="gpt-spent">0</span></p>
+        <button onclick="buyStock('GPT')">Buy</button>
+        <button onclick="sellStock('GPT')">Sell</button>
+      </div>
     </div>
     <!-- Chart Container -->
     <div class="chart-container">
@@ -166,10 +177,12 @@
       GNL: { price: 25, owned: 0, spent: 0 },
       DC: { price: 20, owned: 0, spent: 0 },
       SCC: { price: 10, owned: 0, spent: 0 },
-      CCPC: { price: 18, owned: 0, spent: 0 }
+      CCPC: { price: 18, owned: 0, spent: 0 },
+      GPT: { price: 50, owned: 0, spent: 0 }  // New GPT stock
     };
 
-    // Headlines with text and an impact on stocks.
+    // Headlines with text and impacts on specific stocks.
+    // For GPT, some headlines have explicit impacts.
     let headlines = [
       { text: "SCC opens its first international restaurant!", impact: { SCC: 5 } },
       { text: "New chicken dish goes viral – SCC stock soars.", impact: { SCC: 8 } },
@@ -183,9 +196,24 @@
       { text: "D&C 005 dips after global recession fears hit.", impact: { DC: -4 } },
       { text: "CCPC releases limited-edition plushies, creating buzz.", impact: { CCPC: 10 } },
       { text: "CCPC's production delay hurts its stock.", impact: { CCPC: -6 } },
-      // Rare market crash event (1/10000 chance)
-      { text: "A global market crash leads to significant drops across the board.", impact: { JI: -10, GNL: -10, DC: -10, SCC: -10, CCPC: -10 } }
+      { text: "AI breakthrough boosts GPT stock.", impact: { GPT: 10 } },
+      { text: "GPT stock dips after controversial AI statement.", impact: { GPT: -8 } },
+      // Rare market crash event (affects every stock)
+      { text: "A global market crash leads to significant drops across the board.", impact: { JI: -10, GNL: -10, DC: -10, SCC: -10, CCPC: -10, GPT: -10 } }
     ];
+
+    /***** Custom GPT Price Update Logic *****/
+    function updateGPTStockPrice(news) {
+      let prevPrice = stocks.GPT.price;
+      // Use the GPT impact if provided; otherwise, default to 0.
+      let headlineImpact = (news.impact && news.impact.GPT) ? news.impact.GPT : 0;
+      // Generate a random component between -5 and 5.
+      let randomComponent = Math.floor(Math.random() * 11) - 5;
+      // New GPT price: 50% from headline impact (and previous value) and 50% random.
+      let newPrice = prevPrice + 0.5 * (headlineImpact + randomComponent);
+      if (newPrice < 0) newPrice = 0;
+      return newPrice;
+    }
 
     /***** Chart.js Setup *****/
     const ctx = document.getElementById('stockChart').getContext('2d');
@@ -196,7 +224,8 @@
         { label: 'GNL - Galactic Neo Labs', data: [stocks.GNL.price], borderColor: 'orange', fill: false },
         { label: 'D&C 005', data: [stocks.DC.price], borderColor: 'green', fill: false },
         { label: 'SCC - Shashwat Curry Company', data: [stocks.SCC.price], borderColor: 'red', fill: false },
-        { label: 'CCPC - Carly Cute Plushy Company', data: [stocks.CCPC.price], borderColor: 'purple', fill: false }
+        { label: 'CCPC - Carly Cute Plushy Company', data: [stocks.CCPC.price], borderColor: 'purple', fill: false },
+        { label: 'GPT - AI Stock', data: [stocks.GPT.price], borderColor: 'magenta', fill: false }
       ]
     };
     let chartOptions = {
@@ -219,16 +248,19 @@
       document.getElementById('dc-price').innerText = stocks.DC.price;
       document.getElementById('scc-price').innerText = stocks.SCC.price;
       document.getElementById('ccpc-price').innerText = stocks.CCPC.price;
+      document.getElementById('gpt-price').innerText = stocks.GPT.price;
       document.getElementById('ji-owned').innerText = stocks.JI.owned;
       document.getElementById('gnl-owned').innerText = stocks.GNL.owned;
       document.getElementById('dc-owned').innerText = stocks.DC.owned;
       document.getElementById('scc-owned').innerText = stocks.SCC.owned;
       document.getElementById('ccpc-owned').innerText = stocks.CCPC.owned;
+      document.getElementById('gpt-owned').innerText = stocks.GPT.owned;
       document.getElementById('ji-spent').innerText = stocks.JI.spent;
       document.getElementById('gnl-spent').innerText = stocks.GNL.spent;
       document.getElementById('dc-spent').innerText = stocks.DC.spent;
       document.getElementById('scc-spent').innerText = stocks.SCC.spent;
       document.getElementById('ccpc-spent').innerText = stocks.CCPC.spent;
+      document.getElementById('gpt-spent').innerText = stocks.GPT.spent;
     }
     function updateGraph() {
       chartData.labels.push(`Day ${day}`);
@@ -237,6 +269,7 @@
       chartData.datasets[2].data.push(stocks.DC.price);
       chartData.datasets[3].data.push(stocks.SCC.price);
       chartData.datasets[4].data.push(stocks.CCPC.price);
+      chartData.datasets[5].data.push(stocks.GPT.price);
       stockChart.update();
     }
 
@@ -246,11 +279,14 @@
         setTimeout(() => {
           let newPrices = {};
           Object.keys(stocks).forEach(stock => {
-            // Apply news impact plus random volatility (-1, 0, or 1)
-            let impact = news.impact[stock] || 0;
-            let randomVolatility = Math.floor(Math.random() * 3) - 1;
-            newPrices[stock] = stocks[stock].price + impact + randomVolatility;
-            if (newPrices[stock] < 0) newPrices[stock] = 0;
+            if (stock === "GPT") {
+              newPrices[stock] = updateGPTStockPrice(news);
+            } else {
+              let impact = news.impact[stock] || 0;
+              let randomVolatility = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
+              newPrices[stock] = stocks[stock].price + impact + randomVolatility;
+              if (newPrices[stock] < 0) newPrices[stock] = 0;
+            }
           });
           resolve(newPrices);
         }, 500); // Simulated API delay
@@ -259,19 +295,19 @@
 
     /***** News and Price Update with Text-to-Speech *****/
     async function applyNews() {
-      // Choose a random news event
+      // Choose a random news event.
       let news = headlines[Math.floor(Math.random() * headlines.length)];
-      // Check for a rare market crash event (1/10000 chance)
+      // Check for a rare market crash event (1/10000 chance).
       if (Math.random() < 0.0001) {
         news = headlines.find(h => h.text.includes("market crash"));
       }
-      // Display the news headline
+      // Display the news headline.
       document.getElementById('headline').innerText = news.text;
-      // Cancel any ongoing speech and speak the current headline
+      // Cancel any ongoing speech and speak the current headline.
       speechSynthesis.cancel();
       let utterance = new SpeechSynthesisUtterance(news.text);
       speechSynthesis.speak(utterance);
-      // Update prices based on the news via the simulated API
+      // Update prices via the simulated API.
       let newPrices = await fetchPriceUpdate(news);
       Object.keys(newPrices).forEach(stock => {
         stocks[stock].price = newPrices[stock];
