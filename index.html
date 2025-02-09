@@ -123,8 +123,8 @@
         let day = 1;
         let money = 100;
         let stocks = {
-            ACD: { price: 10, owned: 0, history: [] },
-            FFI: { price: 15, owned: 0, history: [] }
+            ACD: { price: 10, owned: 0, history: [], dividendRate: 0.1 },
+            FFI: { price: 15, owned: 0, history: [], dividendRate: 0.05 }
         };
         let headlines = [
             { text: "Chicken prices soar!", effect: { ACD: 5 } },
@@ -132,7 +132,9 @@
             { text: "Stock market stable.", effect: {} },
             { text: "Chicken farm disaster!", effect: { ACD: -10 } },
             { text: "Massive government contract for FFI!", effect: { FFI: 10 } },
-            { text: "Market crash!", effect: { ACD: -20, FFI: -20 }, rare: true }
+            { text: "Market crash!", effect: { ACD: -20, FFI: -20 }, rare: true },
+            { text: "Massive drought hits chicken production!", effect: { ACD: -15 } },
+            { text: "FFI acquires new fart technology!", effect: { FFI: 8 } }
         ];
 
         function updateDisplay() {
@@ -167,6 +169,7 @@
             let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
             document.getElementById("headline").innerText = headline.text;
 
+            // Apply price changes
             for (let stock in stocks) {
                 let change = (Math.random() * 4 - 2) + (stocks[stock].price > 20 ? -1 : 1);
                 stocks[stock].price += change;
@@ -174,6 +177,13 @@
                 stocks[stock].price = Math.max(1, stocks[stock].price);
                 stocks[stock].history.push(stocks[stock].price);
             }
+
+            // Apply dividends
+            for (let stock in stocks) {
+                let dividend = stocks[stock].price * stocks[stock].dividendRate * stocks[stock].owned;
+                money += dividend;
+            }
+
             updateDisplay();
         }
 
@@ -218,3 +228,4 @@
     </script>
 </body>
 </html>
+
