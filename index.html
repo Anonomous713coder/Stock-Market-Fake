@@ -7,10 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Arial', sans-serif;
             text-align: center; 
-            background-color: #f4f4f4; 
-            color: #333;
+            background-color: #2c3e50; 
+            color: #ecf0f1;
         }
         .container {
             display: flex;
@@ -26,15 +26,15 @@
         .stock { 
             margin: 20px; 
             padding: 15px; 
-            border: 2px solid #333; 
+            border: 2px solid #ecf0f1; 
             border-radius: 10px;
-            background: white;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            background: #34495e;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
             width: 250px;
         }
         .headline { 
             font-weight: bold; 
-            color: red; 
+            color: #e74c3c; 
             margin-top: 10px; 
         }
         canvas { 
@@ -42,7 +42,7 @@
             background: white;
             border-radius: 10px;
             padding: 10px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -118,7 +118,7 @@
         
         function nextDay() {
             day++;
-            let headlineOptions = headlines.filter(h => !h.rare || Math.random() < 0.05);
+            let headlineOptions = headlines.filter(h => !h.rare || Math.random() < 0.001);
             let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
             document.getElementById("headline").innerText = headline.text;
             
@@ -130,13 +130,6 @@
                 stocks[stock].history.push(stocks[stock].price);
             }
             updateDisplay();
-        }
-        
-        function updateChart() {
-            stockChart.data.labels.push(day);
-            stockChart.data.datasets[0].data.push(stocks.ACD.price);
-            stockChart.data.datasets[1].data.push(stocks.FFI.price);
-            stockChart.update();
         }
         
         let ctx = document.getElementById("stockChart").getContext("2d");
@@ -152,7 +145,7 @@
             options: { responsive: true }
         });
         
-        setInterval(nextDay, 15000); // 15 seconds = 1 day
+        setInterval(nextDay, 15000);
         updateDisplay();
     </script>
 </body>
