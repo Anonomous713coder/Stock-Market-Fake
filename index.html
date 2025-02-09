@@ -143,6 +143,16 @@
             DC005: { price: 12.5, owned: 0, history: [], percentChange: 0, previousPrice: 12.5 } // D&C 005 initialized
         };
 
+        let headlines = [
+            { text: "Chicken prices soar!", effect: { ACD: 5 } },
+            { text: "Fart gas shortage impacts JI!", effect: { JI: -5 } },
+            { text: "Stock market stable.", effect: {} },
+            { text: "Chicken farm disaster!", effect: { ACD: -10 } },
+            { text: "Massive government contract for JI!", effect: { JI: 10 } },
+            { text: "Massive drought hits chicken production!", effect: { ACD: -15 } },
+            { text: "JI's new fart technology boosts stocks!", effect: { JI: 8 } }
+        ];
+
         // Speech synthesis function
         function speak(text) {
             const speech = new SpeechSynthesisUtterance(text);
@@ -197,29 +207,33 @@
         function nextDay() {
             day++;
 
-            // Simulate stock price changes
-            let changeACD = (Math.random() * 4 - 2);
-            let changeJI = (Math.random() * 4 - 2);
+            // Update the prices with random effect from news headlines
+            let randomHeadline = headlines[Math.floor(Math.random() * headlines.length)];
+            let headlineText = randomHeadline.text;
+            let headlineEffect = randomHeadline.effect;
 
-            stocks.ACD.previousPrice = stocks.ACD.price;
-            stocks.JI.previousPrice = stocks.JI.price;
+            // Apply effect from headline to stocks
+            if (headlineEffect.ACD) {
+                stocks.ACD.price += headlineEffect.ACD;
+            }
+            if (headlineEffect.JI) {
+                stocks.JI.price += headlineEffect.JI;
+            }
 
-            // Update stock prices
-            stocks.ACD.price += changeACD;
-            stocks.JI.price += changeJI;
+            // D&C 005 Price is the average of ACD and JI prices
+            stocks.DC005.price = (stocks.ACD.price + stocks.JI.price) / 2;
 
-            // Calculate percent changes
+            // Update percent change for each stock
             stocks.ACD.percentChange = ((stocks.ACD.price - stocks.ACD.previousPrice) / stocks.ACD.previousPrice) * 100;
             stocks.JI.percentChange = ((stocks.JI.price - stocks.JI.previousPrice) / stocks.JI.previousPrice) * 100;
 
-            // Calculate D&C 005 price and percent change as average of ACD and JI
-            stocks.DC005.price = (stocks.ACD.price + stocks.JI.price) / 2;
-            stocks.DC005.percentChange = ((stocks.ACD.percentChange + stocks.JI.percentChange) / 2);
+            // Announce news headline
+            document.getElementById("headline").innerText = headlineText;
+            speak(headlineText);
 
-            // Apply random news headline effect
-            let headlineEffect = Math.random() < 0.5 ? -1 : 1;
-            stocks.ACD.price += headlineEffect;
-            stocks.JI.price += headlineEffect;
+            // Update previous prices for the next day's calculation
+            stocks.ACD.previousPrice = stocks.ACD.price;
+            stocks.JI.previousPrice = stocks.JI.price;
 
             updateDisplay();
         }
@@ -265,6 +279,7 @@
         setInterval(nextDay, 10000); // 10 seconds = 1 day
         updateDisplay();
     </script>
+
 </body>
 </html>
 
