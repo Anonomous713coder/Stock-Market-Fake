@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fake Stock Market</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
         .stock { margin: 20px; padding: 10px; border: 1px solid black; display: inline-block; }
         .headline { font-weight: bold; color: red; margin-top: 10px; }
+        canvas { max-width: 600px; margin: 20px auto; }
     </style>
 </head>
 <body>
@@ -32,14 +34,15 @@
     </div>
     
     <p class="headline" id="headline">No news today.</p>
-    <button onclick="nextDay()">Next Day</button>
+    
+    <canvas id="stockChart"></canvas>
     
     <script>
         let day = 1;
         let money = 100;
         let stocks = {
-            ACD: { price: 10, owned: 0 },
-            FFI: { price: 15, owned: 0 }
+            ACD: { price: 10, owned: 0, history: [] },
+            FFI: { price: 15, owned: 0, history: [] }
         };
         let headlines = [
             { text: "Chicken prices soar!", effect: { ACD: 5 } },
@@ -47,7 +50,7 @@
             { text: "Stock market stable.", effect: {} },
             { text: "Chicken farm disaster!", effect: { ACD: -10 } },
             { text: "Massive government contract for FFI!", effect: { FFI: 10 } },
-            { text: "Market crash!", effect: { ACD: -20, FFI: -20 } }
+            { text: "Market crash!", effect: { ACD: -20, FFI: -20 }, rare: true }
         ];
         
         function updateDisplay() {
@@ -57,6 +60,7 @@
             document.getElementById("ffi-price").innerText = stocks.FFI.price.toFixed(2);
             document.getElementById("acd-owned").innerText = stocks.ACD.owned;
             document.getElementById("ffi-owned").innerText = stocks.FFI.owned;
+            updateChart();
         }
         
         function buyStock(stock) {
@@ -77,7 +81,8 @@
         
         function nextDay() {
             day++;
-            let headline = headlines[Math.floor(Math.random() * headlines.length)];
+            let headlineOptions = headlines.filter(h => !h.rare || Math.random() < 0.05);
+            let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
             document.getElementById("headline").innerText = headline.text;
             
             for (let stock in stocks) {
@@ -85,10 +90,32 @@
                 stocks[stock].price += change;
                 stocks[stock].price += headline.effect[stock] || 0;
                 stocks[stock].price = Math.max(1, stocks[stock].price);
+                stocks[stock].history.push(stocks[stock].price);
             }
             updateDisplay();
         }
         
+        function updateChart() {
+            stockChart.data.labels.push(day);
+            stockChart.data.datasets[0].data.push(stocks.ACD.price);
+            stockChart.data.datasets[1].data.push(stocks.FFI.price);
+            stockChart.update();
+        }
+        
+        let ctx = document.getElementById("stockChart").getContext("2d");
+        let stockChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [
+                    { label: "ACD Price", borderColor: "blue", data: [] },
+                    { label: "FFI Price", borderColor: "green", data: [] }
+                ]
+            },
+            options: { responsive: true }
+        });
+        
+        setInterval(nextDay, 20000); // 20 seconds = 2 hours
         updateDisplay();
     </script>
 </body>
