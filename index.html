@@ -98,7 +98,7 @@
 <body>
 
     <h1>Stock Market Simulation</h1>
-    <p class="info">Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
+    <p class="info">Hour: <span id="hour">1</span> | Money: $<span id="money">100</span></p>
     <p class="percent-change" id="percent-change">Percent Change: 0%</p>
 
     <div class="container">
@@ -134,31 +134,14 @@
     <p class="headline" id="headline">No news today.</p>
 
     <script>
-        let day = 1;
+        let hour = 1;
         let money = 100;
         let initialPrices = { ACD: 10, JI: 15, DC005: 12.5 };
         let stocks = {
-            ACD: { price: 10, owned: 0, history: [], dividendRate: 0.1 },
-            JI: { price: 15, owned: 0, history: [], dividendRate: 0.05 },
-            DC005: { price: 12.5, owned: 0, history: [] } // D&C 005 initialized with average price
+            ACD: { price: 10, owned: 0, history: [], percentChange: 0, previousPrice: 10 },
+            JI: { price: 15, owned: 0, history: [], percentChange: 0, previousPrice: 15 },
+            DC005: { price: 12.5, owned: 0, history: [], percentChange: 0, previousPrice: 12.5 } // D&C 005 initialized
         };
-        let headlines = [
-            { text: "ACD announces major expansion into international markets.", effect: { ACD: 8 }, rarity: 0.2 },
-            { text: "Jacob Intercorps faces recall of faulty technology.", effect: { JI: -7 }, rarity: 0.1 },
-            { text: "ACD achieves record profits in Q2, stock price rises.", effect: { ACD: 12 }, rarity: 0.25 },
-            { text: "Jacob Intercorps launches a groundbreaking new product, stock surges.", effect: { JI: 15 }, rarity: 0.3 },
-            { text: "ACD suffers from bird flu outbreak, production affected.", effect: { ACD: -10 }, rarity: 0.1 },
-            { text: "Jacob Intercorps secures long-term government contracts.", effect: { JI: 10 }, rarity: 0.15 },
-            { text: "ACD stock drops due to failed negotiations with major retailers.", effect: { ACD: -5 }, rarity: 0.2 },
-            { text: "Jacob Intercorps experiences a minor cyber attack, no data breach.", effect: { JI: -3 }, rarity: 0.05 },
-            { text: "ACD stock jumps after CEO announces innovative new farming methods.", effect: { ACD: 7 }, rarity: 0.25 },
-            { text: "Jacob Intercorps faces a strike from factory workers, delays in production.", effect: { JI: -6 }, rarity: 0.1 },
-            { text: "ACD receives major investment from a top venture capital firm.", effect: { ACD: 9 }, rarity: 0.3 },
-            { text: "Jacob Intercorps faces strong competition from new market players.", effect: { JI: -8 }, rarity: 0.2 },
-            { text: "ACD reports new poultry product line, boosting stock price.", effect: { ACD: 10 }, rarity: 0.2 },
-            { text: "Jacob Intercorps announces global expansion into renewable energy sector.", effect: { JI: 12 }, rarity: 0.15 },
-            { text: "ACD faces supply chain issues due to natural disasters.", effect: { ACD: -15 }, rarity: 0.1 }
-        ];
 
         // Speech synthesis function
         function speak(text) {
@@ -171,7 +154,7 @@
         }
 
         function updateDisplay() {
-            document.getElementById("day").innerText = day;
+            document.getElementById("hour").innerText = hour;
             document.getElementById("money").innerText = money.toFixed(2);
             document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
             document.getElementById("ji-price").innerText = stocks.JI.price.toFixed(2);
@@ -180,14 +163,14 @@
             document.getElementById("ji-owned").innerText = stocks.JI.owned;
             document.getElementById("dc005-owned").innerText = stocks.DC005.owned;
 
-            // Calculate percent change for ACD and JI
-            let percentChangeACD = ((stocks.ACD.price - initialPrices.ACD) / initialPrices.ACD) * 100;
-            let percentChangeJI = ((stocks.JI.price - initialPrices.JI) / initialPrices.JI) * 100;
+            // Calculate percent change for ACD, JI, and D&C 005
+            let percentChangeACD = ((stocks.ACD.price - stocks.ACD.previousPrice) / stocks.ACD.previousPrice) * 100;
+            let percentChangeJI = ((stocks.JI.price - stocks.JI.previousPrice) / stocks.JI.previousPrice) * 100;
 
             // Average percent change for D&C 005
-            let percentChangeDC005 = ((stocks.ACD.price + stocks.JI.price) / 2 - initialPrices.DC005) / initialPrices.DC005 * 100;
+            let percentChangeDC005 = ((stocks.ACD.percentChange + stocks.JI.percentChange) / 2).toFixed(2);
 
-            document.getElementById("percent-change").innerText = `Percent Change: ACD: ${percentChangeACD.toFixed(2)}%, JI: ${percentChangeJI.toFixed(2)}%, D&C 005: ${percentChangeDC005.toFixed(2)}%`;
+            document.getElementById("percent-change").innerText = `Percent Change: ACD: ${percentChangeACD.toFixed(2)}%, JI: ${percentChangeJI.toFixed(2)}%, D&C 005: ${percentChangeDC005}%`;
 
             updateChart();
         }
@@ -208,24 +191,32 @@
             }
         }
 
-        function nextDay() {
-            day++;
-            let headlineOptions = headlines.filter(h => Math.random() < h.rarity);
-            let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
-            document.getElementById("headline").innerText = headline.text;
-            speak(headline.text);
+        function nextHour() {
+            hour++;
 
-            // Apply price changes for ACD and JI
-            for (let stock in stocks) {
-                let change = (Math.random() * 4 - 2) + (stocks[stock].price > 20 ? -1 : 1);
-                stocks[stock].price += change;
-                stocks[stock].price += headline.effect[stock] || 0;
-                stocks[stock].price = Math.max(1, stocks[stock].price);
-                stocks[stock].history.push(stocks[stock].price);
-            }
+            // Calculate new price for ACD and JI with random price fluctuations
+            let changeACD = (Math.random() * 4 - 2);
+            let changeJI = (Math.random() * 4 - 2);
 
-            // Update D&C 005 price as the average of ACD and JI
+            stocks.ACD.previousPrice = stocks.ACD.price;
+            stocks.JI.previousPrice = stocks.JI.price;
+
+            // Update stock prices
+            stocks.ACD.price += changeACD;
+            stocks.JI.price += changeJI;
+
+            // Calculate percent changes
+            stocks.ACD.percentChange = ((stocks.ACD.price - stocks.ACD.previousPrice) / stocks.ACD.previousPrice) * 100;
+            stocks.JI.percentChange = ((stocks.JI.price - stocks.JI.previousPrice) / stocks.JI.previousPrice) * 100;
+
+            // Calculate D&C 005 price and percent change as average of ACD and JI
             stocks.DC005.price = (stocks.ACD.price + stocks.JI.price) / 2;
+            stocks.DC005.percentChange = ((stocks.ACD.percentChange + stocks.JI.percentChange) / 2);
+
+            // Apply random news headline effect
+            let headlineEffect = Math.random() < 0.5 ? -1 : 1;
+            stocks.ACD.price += headlineEffect;
+            stocks.JI.price += headlineEffect;
 
             updateDisplay();
         }
@@ -247,7 +238,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Day'
+                            text: 'Hour'
                         }
                     },
                     y: {
@@ -261,18 +252,19 @@
         });
 
         function updateChart() {
-            stockChart.data.labels.push(day);
+            stockChart.data.labels.push(hour);
             stockChart.data.datasets[0].data.push(stocks.ACD.price);
             stockChart.data.datasets[1].data.push(stocks.JI.price);
             stockChart.data.datasets[2].data.push(stocks.DC005.price);
             stockChart.update();
         }
 
-        setInterval(nextDay, 10000); // 10 seconds = 1 day
+        setInterval(nextHour, 10000); // 10 seconds = 1 hour
         updateDisplay();
     </script>
 </body>
 </html>
+
 
 
 
