@@ -118,6 +118,14 @@
                 <button onclick="buyStock('JI')">Buy</button>
                 <button onclick="sellStock('JI')">Sell</button>
             </div>
+
+            <div class="stock">
+                <h2>D&C 005</h2>
+                <p>Price: $<span id="dc005-price">12.5</span></p>
+                <p>Owned: <span id="dc005-owned">0</span></p>
+                <button onclick="buyStock('DC005')">Buy</button>
+                <button onclick="sellStock('DC005')">Sell</button>
+            </div>
         </div>
 
         <canvas id="stockChart"></canvas>
@@ -128,10 +136,11 @@
     <script>
         let day = 1;
         let money = 100;
-        let initialPrices = { ACD: 10, JI: 15 };
+        let initialPrices = { ACD: 10, JI: 15, DC005: 12.5 };
         let stocks = {
             ACD: { price: 10, owned: 0, history: [], dividendRate: 0.1 },
-            JI: { price: 15, owned: 0, history: [], dividendRate: 0.05 }
+            JI: { price: 15, owned: 0, history: [], dividendRate: 0.05 },
+            DC005: { price: 12.5, owned: 0, history: [] } // D&C 005 initialized with average price
         };
         let headlines = [
             { text: "ACD announces major expansion into international markets.", effect: { ACD: 8 }, rarity: 0.2 },
@@ -166,12 +175,21 @@
             document.getElementById("money").innerText = money.toFixed(2);
             document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
             document.getElementById("ji-price").innerText = stocks.JI.price.toFixed(2);
+            document.getElementById("dc005-price").innerText = stocks.DC005.price.toFixed(2);
             document.getElementById("acd-owned").innerText = stocks.ACD.owned;
             document.getElementById("ji-owned").innerText = stocks.JI.owned;
+            document.getElementById("dc005-owned").innerText = stocks.DC005.owned;
 
-            // Calculate percent change
-            let percentChange = ((stocks.ACD.price - initialPrices.ACD) / initialPrices.ACD) * 100;
-            document.getElementById("percent-change").innerText = `Percent Change: ${percentChange.toFixed(2)}%`;
+            // Calculate percent change for ACD and JI
+            let percentChangeACD = ((stocks.ACD.price - initialPrices.ACD) / initialPrices.ACD) * 100;
+            let percentChangeJI = ((stocks.JI.price - initialPrices.JI) / initialPrices.JI) * 100;
+
+            // Average percent change for D&C 005
+            let percentChangeDC005 = ((stocks.ACD.price + stocks.JI.price) / 2 - initialPrices.DC005) / initialPrices.DC005 * 100;
+
+            document.getElementById("percent-change").innerText = `Percent Change: ACD: ${percentChangeACD.toFixed(2)}%, JI: ${percentChangeJI.toFixed(2)}%, D&C 005: ${percentChangeDC005.toFixed(2)}%`;
+
+            updateChart();
         }
 
         function buyStock(stock) {
@@ -195,9 +213,9 @@
             let headlineOptions = headlines.filter(h => Math.random() < h.rarity);
             let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
             document.getElementById("headline").innerText = headline.text;
-            speak(headline.text); // Add voice for the news
+            speak(headline.text);
 
-            // Apply price changes
+            // Apply price changes for ACD and JI
             for (let stock in stocks) {
                 let change = (Math.random() * 4 - 2) + (stocks[stock].price > 20 ? -1 : 1);
                 stocks[stock].price += change;
@@ -206,11 +224,8 @@
                 stocks[stock].history.push(stocks[stock].price);
             }
 
-            // Apply dividends
-            for (let stock in stocks) {
-                let dividend = stocks[stock].price * stocks[stock].dividendRate * stocks[stock].owned;
-                money += dividend;
-            }
+            // Update D&C 005 price as the average of ACD and JI
+            stocks.DC005.price = (stocks.ACD.price + stocks.JI.price) / 2;
 
             updateDisplay();
         }
@@ -222,7 +237,8 @@
                 labels: [],
                 datasets: [
                     { label: "ACD Price", borderColor: "blue", fill: false, data: [] },
-                    { label: "JI Price", borderColor: "green", fill: false, data: [] }
+                    { label: "JI Price", borderColor: "green", fill: false, data: [] },
+                    { label: "D&C 005 Price", borderColor: "orange", fill: false, data: [] }
                 ]
             },
             options: {
@@ -248,6 +264,7 @@
             stockChart.data.labels.push(day);
             stockChart.data.datasets[0].data.push(stocks.ACD.price);
             stockChart.data.datasets[1].data.push(stocks.JI.price);
+            stockChart.data.datasets[2].data.push(stocks.DC005.price);
             stockChart.update();
         }
 
@@ -256,6 +273,7 @@
     </script>
 </body>
 </html>
+
 
 
 
