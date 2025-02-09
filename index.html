@@ -121,6 +121,22 @@
                 <button onclick="buyStock('DC')">Buy</button>
                 <button onclick="sellStock('DC')">Sell</button>
             </div>
+            <div class="stock">
+                <h2>SCC - Shashwat Curry Company</h2>
+                <p>Price: $<span id="scc-price">30</span></p>
+                <p>Owned: <span id="scc-owned">0</span></p>
+                <p>Total Spent: $<span id="scc-spent">0</span></p>
+                <button onclick="buyStock('SCC')">Buy</button>
+                <button onclick="sellStock('SCC')">Sell</button>
+            </div>
+            <div class="stock">
+                <h2>CCPC - Carly Cute Plushy Company</h2>
+                <p>Price: $<span id="ccpc-price">22</span></p>
+                <p>Owned: <span id="ccpc-owned">0</span></p>
+                <p>Total Spent: $<span id="ccpc-spent">0</span></p>
+                <button onclick="buyStock('CCPC')">Buy</button>
+                <button onclick="sellStock('CCPC')">Sell</button>
+            </div>
         </div>
         <canvas id="stockChart"></canvas>
     </div>
@@ -130,10 +146,12 @@
     <script>
         let day = 1;
         let money = 100;
-        let stocks = {
+        let stockData = {
             JI: { price: 15, owned: 0, spent: 0, dividendRate: 0.05 },
             GNL: { price: 25, owned: 0, spent: 0, dividendRate: 0.08 },
-            DC: { price: 20, owned: 0, spent: 0, dividendRate: 0.04 }
+            DC: { price: 20, owned: 0, spent: 0, dividendRate: 0.04 },
+            SCC: { price: 30, owned: 0, spent: 0, dividendRate: 0.06 },
+            CCPC: { price: 22, owned: 0, spent: 0, dividendRate: 0.07 }
         };
         let headlines = [
             "Tech breakthrough boosts GNL!",
@@ -145,8 +163,55 @@
             "GNL announces space colonization plans!",
             "JI secures major international deal!",
             "Major cyberattack disrupts market!",
-            "New energy discovery revolutionizes industry!"
+            "New energy discovery revolutionizes industry!",
+            "SCC expands to new markets!",
+            "CCPC releases highly anticipated plushy collection!"
         ];
+
+        let chartData = {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Stock Price Over Time',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false,
+                }
+            ]
+        };
+
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        const stockChart = new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
+                },
+                scales: {
+                    x: { 
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Days'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Stock Value'
+                        }
+                    }
+                }
+            }
+        });
 
         function updateNews() {
             let headline = headlines[Math.floor(Math.random() * headlines.length)];
@@ -155,10 +220,27 @@
             speechSynthesis.speak(speech);
         }
 
+        function updateDisplay() {
+            document.getElementById("day").innerText = day;
+            document.getElementById("money").innerText = money.toFixed(2);
+            
+            for (let stock in stockData) {
+                document.getElementById(stock.toLowerCase() + "-price").innerText = stockData[stock].price;
+                document.getElementById(stock.toLowerCase() + "-owned").innerText = stockData[stock].owned;
+                document.getElementById(stock.toLowerCase() + "-spent").innerText = stockData[stock].spent;
+            }
+
+            // Update chart data
+            chartData.labels.push(day);
+            chartData.datasets[0].data.push(stockData.JI.price); // Change this to include other stocks as needed
+
+            stockChart.update();
+        }
+
         function distributeDividends() {
             let totalDividends = 0;
-            for (let stock in stocks) {
-                totalDividends += stocks[stock].owned * stocks[stock].price * stocks[stock].dividendRate;
+            for (let stock in stockData) {
+                totalDividends += stockData[stock].owned * stockData[stock].price * stockData[stock].dividendRate;
             }
             money += totalDividends;
         }
@@ -171,10 +253,29 @@
         }
 
         setInterval(nextDay, 5000);
+
+        // Stock buying and selling logic
+        function buyStock(stock) {
+            if (money >= stockData[stock].price) {
+                stockData[stock].owned++;
+                money -= stockData[stock].price;
+                stockData[stock].spent += stockData[stock].price;
+            }
+        }
+
+        function sellStock(stock) {
+            if (stockData[stock].owned > 0) {
+                stockData[stock].owned--;
+                money += stockData[stock].price;
+                stockData[stock].spent -= stockData[stock].price;
+            }
+        }
+
         updateDisplay();
     </script>
 </body>
 </html>
+
 
 
 
