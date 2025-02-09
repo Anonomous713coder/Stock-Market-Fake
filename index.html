@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake Stock Market</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .stock { margin: 20px; padding: 10px; border: 1px solid black; display: inline-block; }
+        .headline { font-weight: bold; color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Fake Stock Market</h1>
+    <p>Day: <span id="day">1</span></p>
+    <p>Money: $<span id="money">100</span></p>
+    
+    <div class="stock">
+        <h2>ACD - American Chicken Department</h2>
+        <p>Price: $<span id="acd-price">10</span></p>
+        <p>Owned: <span id="acd-owned">0</span></p>
+        <button onclick="buyStock('ACD')">Buy</button>
+        <button onclick="sellStock('ACD')">Sell</button>
+    </div>
+    
+    <div class="stock">
+        <h2>FFI - Federal Fart Intercorps</h2>
+        <p>Price: $<span id="ffi-price">15</span></p>
+        <p>Owned: <span id="ffi-owned">0</span></p>
+        <button onclick="buyStock('FFI')">Buy</button>
+        <button onclick="sellStock('FFI')">Sell</button>
+    </div>
+    
+    <p class="headline" id="headline">No news today.</p>
+    <button onclick="nextDay()">Next Day</button>
+    
+    <script>
+        let day = 1;
+        let money = 100;
+        let stocks = {
+            ACD: { price: 10, owned: 0 },
+            FFI: { price: 15, owned: 0 }
+        };
+        let headlines = [
+            { text: "Chicken prices soar!", effect: { ACD: 5 } },
+            { text: "Fart gas shortage impacts FFI!", effect: { FFI: -5 } },
+            { text: "Stock market stable.", effect: {} },
+            { text: "Chicken farm disaster!", effect: { ACD: -10 } },
+            { text: "Massive government contract for FFI!", effect: { FFI: 10 } },
+            { text: "Market crash!", effect: { ACD: -20, FFI: -20 } }
+        ];
+        
+        function updateDisplay() {
+            document.getElementById("day").innerText = day;
+            document.getElementById("money").innerText = money.toFixed(2);
+            document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
+            document.getElementById("ffi-price").innerText = stocks.FFI.price.toFixed(2);
+            document.getElementById("acd-owned").innerText = stocks.ACD.owned;
+            document.getElementById("ffi-owned").innerText = stocks.FFI.owned;
+        }
+        
+        function buyStock(stock) {
+            if (money >= stocks[stock].price) {
+                money -= stocks[stock].price;
+                stocks[stock].owned++;
+                updateDisplay();
+            }
+        }
+        
+        function sellStock(stock) {
+            if (stocks[stock].owned > 0) {
+                money += stocks[stock].price;
+                stocks[stock].owned--;
+                updateDisplay();
+            }
+        }
+        
+        function nextDay() {
+            day++;
+            let headline = headlines[Math.floor(Math.random() * headlines.length)];
+            document.getElementById("headline").innerText = headline.text;
+            
+            for (let stock in stocks) {
+                let change = (Math.random() * 4 - 2) + (stocks[stock].price > 20 ? -1 : 1); 
+                stocks[stock].price += change;
+                stocks[stock].price += headline.effect[stock] || 0;
+                stocks[stock].price = Math.max(1, stocks[stock].price);
+            }
+            updateDisplay();
+        }
+        
+        updateDisplay();
+    </script>
+</body>
+</html>
