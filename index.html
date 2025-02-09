@@ -6,10 +6,44 @@
     <title>Fake Stock Market</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .stock { margin: 20px; padding: 10px; border: 1px solid black; display: inline-block; }
-        .headline { font-weight: bold; color: red; margin-top: 10px; }
-        canvas { max-width: 600px; margin: 20px auto; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center; 
+            background-color: #f4f4f4; 
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .stock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .stock { 
+            margin: 20px; 
+            padding: 15px; 
+            border: 2px solid #333; 
+            border-radius: 10px;
+            background: white;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+        }
+        .headline { 
+            font-weight: bold; 
+            color: red; 
+            margin-top: 10px; 
+        }
+        canvas { 
+            max-width: 600px; 
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -17,25 +51,28 @@
     <p>Day: <span id="day">1</span></p>
     <p>Money: $<span id="money">100</span></p>
     
-    <div class="stock">
-        <h2>ACD - American Chicken Department</h2>
-        <p>Price: $<span id="acd-price">10</span></p>
-        <p>Owned: <span id="acd-owned">0</span></p>
-        <button onclick="buyStock('ACD')">Buy</button>
-        <button onclick="sellStock('ACD')">Sell</button>
-    </div>
-    
-    <div class="stock">
-        <h2>FFI - Federal Fart Intercorps</h2>
-        <p>Price: $<span id="ffi-price">15</span></p>
-        <p>Owned: <span id="ffi-owned">0</span></p>
-        <button onclick="buyStock('FFI')">Buy</button>
-        <button onclick="sellStock('FFI')">Sell</button>
+    <div class="container">
+        <div class="stock-container">
+            <div class="stock">
+                <h2>ACD - American Chicken Department</h2>
+                <p>Price: $<span id="acd-price">10</span></p>
+                <p>Owned: <span id="acd-owned">0</span></p>
+                <button onclick="buyStock('ACD')">Buy</button>
+                <button onclick="sellStock('ACD')">Sell</button>
+            </div>
+            
+            <div class="stock">
+                <h2>FFI - Federal Fart Intercorps</h2>
+                <p>Price: $<span id="ffi-price">15</span></p>
+                <p>Owned: <span id="ffi-owned">0</span></p>
+                <button onclick="buyStock('FFI')">Buy</button>
+                <button onclick="sellStock('FFI')">Sell</button>
+            </div>
+        </div>
+        <canvas id="stockChart"></canvas>
     </div>
     
     <p class="headline" id="headline">No news today.</p>
-    
-    <canvas id="stockChart"></canvas>
     
     <script>
         let day = 1;
@@ -115,8 +152,9 @@
             options: { responsive: true }
         });
         
-        setInterval(nextDay, 20000); // 20 seconds = 2 hours
+        setInterval(nextDay, 15000); // 15 seconds = 1 day
         updateDisplay();
     </script>
 </body>
 </html>
+
