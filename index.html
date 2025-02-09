@@ -134,17 +134,21 @@
             JI: { price: 15, owned: 0, history: [], dividendRate: 0.05 }
         };
         let headlines = [
-            { text: "Chicken prices soar!", effect: { ACD: 5 }, rarity: 0.1 },
-            { text: "Jacob Intercorps secures major government contract!", effect: { JI: 10 }, rarity: 0.1 },
-            { text: "Stock market stable.", effect: {}, rarity: 0.4 },
-            { text: "Massive food contamination scandal affects ACD!", effect: { ACD: -10 }, rarity: 0.05 },
-            { text: "Jacob Intercorps expands into international markets!", effect: { JI: 12 }, rarity: 0.15 },
-            { text: "Market crash due to unforeseen global events!", effect: { ACD: -20, JI: -20 }, rarity: 0.02 },
-            { text: "Massive drought impacts chicken production!", effect: { ACD: -15 }, rarity: 0.05 },
-            { text: "Jacob Intercorps develops cutting-edge tech!", effect: { JI: 8 }, rarity: 0.1 },
-            { text: "ACD reaches new distribution milestones!", effect: { ACD: 7 }, rarity: 0.1 },
-            { text: "Jacob Intercorps faces labor strikes in major factories.", effect: { JI: -8 }, rarity: 0.1 },
-            { text: "ACD and JI form strategic partnership!", effect: { ACD: 10, JI: 10 }, rarity: 0.05 }
+            { text: "ACD announces major expansion into international markets.", effect: { ACD: 8 }, rarity: 0.2 },
+            { text: "Jacob Intercorps faces recall of faulty technology.", effect: { JI: -7 }, rarity: 0.1 },
+            { text: "ACD achieves record profits in Q2, stock price rises.", effect: { ACD: 12 }, rarity: 0.25 },
+            { text: "Jacob Intercorps launches a groundbreaking new product, stock surges.", effect: { JI: 15 }, rarity: 0.3 },
+            { text: "ACD suffers from bird flu outbreak, production affected.", effect: { ACD: -10 }, rarity: 0.1 },
+            { text: "Jacob Intercorps secures long-term government contracts.", effect: { JI: 10 }, rarity: 0.15 },
+            { text: "ACD stock drops due to failed negotiations with major retailers.", effect: { ACD: -5 }, rarity: 0.2 },
+            { text: "Jacob Intercorps experiences a minor cyber attack, no data breach.", effect: { JI: -3 }, rarity: 0.05 },
+            { text: "ACD stock jumps after CEO announces innovative new farming methods.", effect: { ACD: 7 }, rarity: 0.25 },
+            { text: "Jacob Intercorps faces a strike from factory workers, delays in production.", effect: { JI: -6 }, rarity: 0.1 },
+            { text: "ACD receives major investment from a top venture capital firm.", effect: { ACD: 9 }, rarity: 0.3 },
+            { text: "Jacob Intercorps faces strong competition from new market players.", effect: { JI: -8 }, rarity: 0.2 },
+            { text: "ACD reports new poultry product line, boosting stock price.", effect: { ACD: 10 }, rarity: 0.2 },
+            { text: "Jacob Intercorps announces global expansion into renewable energy sector.", effect: { JI: 12 }, rarity: 0.15 },
+            { text: "ACD faces supply chain issues due to natural disasters.", effect: { ACD: -15 }, rarity: 0.1 }
         ];
 
         // Speech synthesis function
@@ -247,11 +251,7 @@
             stockChart.update();
         }
 
-        setInterval(() => {
-            nextDay();
-            updateChart();
-        }, 10000); // 10 seconds = 1 day
-
+        setInterval(nextDay, 10000); // 10 seconds = 1 day
         updateDisplay();
     </script>
 </body>
