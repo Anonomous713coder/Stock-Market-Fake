@@ -247,11 +247,16 @@
             stockChart.update();
         }
 
-        setInterval(nextDay, 10000); // 10 seconds = 1 day
+        setInterval(() => {
+            nextDay();
+            updateChart();
+        }, 10000); // 10 seconds = 1 day
+
         updateDisplay();
     </script>
 </body>
 </html>
+
 
 
 
