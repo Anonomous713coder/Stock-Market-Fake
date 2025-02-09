@@ -69,12 +69,11 @@
       font-size: 12px;
       cursor: pointer;
     }
-    /* Updated chart container: 3x wider (3000px max-width) */
+    /* Chart container (3× wider and 2× taller) */
     .chart-container {
       max-width: 3000px;
       margin: 20px auto;
     }
-    /* Updated canvas: 2x taller (1200px height) */
     canvas {
       background: white;
       border-radius: 10px;
@@ -274,12 +273,19 @@
     }
 
     /***** Simulated API Call for Price Update *****/
+    // For every stock except GPT and DC, apply news impact and random volatility.
+    // For GPT, use the custom updateGPTStockPrice() logic.
+    // For DC, compute the average of all other stocks.
     function fetchPriceUpdate(news) {
       return new Promise(resolve => {
         setTimeout(() => {
           let newPrices = {};
+          // Process stocks other than DC.
           Object.keys(stocks).forEach(stock => {
-            if (stock === "GPT") {
+            if (stock === "DC") {
+              // We'll compute DC after processing others.
+              return;
+            } else if (stock === "GPT") {
               newPrices[stock] = updateGPTStockPrice(news);
             } else {
               let impact = news.impact[stock] || 0;
@@ -288,6 +294,16 @@
               if (newPrices[stock] < 0) newPrices[stock] = 0;
             }
           });
+          // Compute DC as the average of all other stocks' new prices.
+          let total = 0, count = 0;
+          Object.keys(newPrices).forEach(stock => {
+            if (stock !== "DC") {
+              total += newPrices[stock];
+              count++;
+            }
+          });
+          let average = count > 0 ? total / count : stocks.DC.price;
+          newPrices["DC"] = average;
           resolve(newPrices);
         }, 500); // Simulated API delay
       });
@@ -360,7 +376,7 @@
       container.scrollBy({ top: 50, behavior: 'smooth' });
     }
 
-    /***** Save/Load Game Feature *****/
+    /***** Save/Load Game Feature (Graph Data Saved as Well) *****/
     function saveGame() {
       const gameState = {
         day,
