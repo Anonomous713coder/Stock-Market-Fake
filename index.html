@@ -11,25 +11,44 @@
             background-color: #f4f6f9;
             color: #2c3e50;
             margin: 0;
-            padding: 20px;
-            text-align: center;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
         h1 {
             color: #34495e;
+            margin-bottom: 10px;
         }
         .container {
             display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
+            justify-content: space-evenly;
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px;
         }
         .stock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 250px;
-            background: white;
-            padding: 15px;
+        }
+        .stock {
+            background: #ffffff;
             border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
             box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
         }
         .stock h2 {
+            font-size: 18px;
             color: #2980b9;
         }
         .stock p {
@@ -46,13 +65,14 @@
             cursor: pointer;
             width: 100%;
             margin-top: 10px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #2980b9;
         }
-        .news {
-            font-size: 18px;
+        .headline {
             font-weight: bold;
+            font-size: 18px;
             color: #e74c3c;
             margin-top: 20px;
         }
@@ -64,135 +84,95 @@
             height: 400px;
             margin-top: 30px;
         }
+        .info {
+            font-size: 18px;
+            color: #34495e;
+        }
     </style>
 </head>
 <body>
 
     <h1>Stock Market Simulation</h1>
-    <p>Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
-    <p id="percent-change">Percent Change: 0%</p>
+    <p class="info">Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
 
     <div class="container">
         <div class="stock-container">
-            <h2>ACD - American Chicken Department</h2>
-            <p>Price: $<span id="acd-price">10</span></p>
-            <p>Owned: <span id="acd-owned">0</span></p>
-            <button onclick="buyStock('ACD')">Buy</button>
-            <button onclick="sellStock('ACD')">Sell</button>
+            <div class="stock">
+                <h2>JI - Jacob Intercorps</h2>
+                <p>Price: $<span id="ji-price">15</span></p>
+                <p>Owned: <span id="ji-owned">0</span></p>
+                <p>Total Spent: $<span id="ji-spent">0</span></p>
+                <button onclick="buyStock('JI')">Buy</button>
+                <button onclick="sellStock('JI')">Sell</button>
+            </div>
+            <div class="stock">
+                <h2>GNL - Galactic Neo Labs</h2>
+                <p>Price: $<span id="gnl-price">25</span></p>
+                <p>Owned: <span id="gnl-owned">0</span></p>
+                <p>Total Spent: $<span id="gnl-spent">0</span></p>
+                <button onclick="buyStock('GNL')">Buy</button>
+                <button onclick="sellStock('GNL')">Sell</button>
+            </div>
+            <div class="stock">
+                <h2>D&C 005 - Market Index</h2>
+                <p>Price: $<span id="dc-price">20</span></p>
+                <p>Owned: <span id="dc-owned">0</span></p>
+                <p>Total Spent: $<span id="dc-spent">0</span></p>
+                <button onclick="buyStock('DC')">Buy</button>
+                <button onclick="sellStock('DC')">Sell</button>
+            </div>
         </div>
-
-        <div class="stock-container">
-            <h2>JI - Jacob Intercorps</h2>
-            <p>Price: $<span id="ji-price">15</span></p>
-            <p>Owned: <span id="ji-owned">0</span></p>
-            <button onclick="buyStock('JI')">Buy</button>
-            <button onclick="sellStock('JI')">Sell</button>
-        </div>
-
-        <div class="stock-container">
-            <h2>D&C 005</h2>
-            <p>Price: $<span id="dc005-price">12.5</span></p>
-            <p>Owned: <span id="dc005-owned">0</span></p>
-            <button onclick="buyStock('DC005')">Buy</button>
-            <button onclick="sellStock('DC005')">Sell</button>
-        </div>
+        <canvas id="stockChart"></canvas>
     </div>
 
-    <canvas id="stockChart"></canvas>
-
-    <p class="news" id="news">No news today.</p>
+    <p class="headline" id="headline">No news today.</p>
 
     <script>
         let day = 1;
         let money = 100;
         let stocks = {
-            ACD: { price: 10, owned: 0, history: [], previousPrice: 10 },
-            JI: { price: 15, owned: 0, history: [], previousPrice: 15 },
-            DC005: { price: 12.5, owned: 0, history: [], previousPrice: 12.5 }
+            JI: { price: 15, owned: 0, spent: 0, dividendRate: 0.05 },
+            GNL: { price: 25, owned: 0, spent: 0, dividendRate: 0.08 },
+            DC: { price: 20, owned: 0, spent: 0, dividendRate: 0.04 }
         };
-
         let headlines = [
-            { text: "Chicken prices soar!", effect: { ACD: 5 } },
-            { text: "Jacob Intercorps launches new AI tech!", effect: { JI: 10 } },
-            { text: "D&C 005 gains investor confidence!", effect: { DC005: 7 } },
-            { text: "Farm disease spreads, impacting ACD!", effect: { ACD: -8 } },
-            { text: "Global market crash hits JI stocks!", effect: { JI: -12 } },
-            { text: "Massive government contract for Jacob Intercorps!", effect: { JI: 15 } },
-            { text: "Drought leads to a chicken shortage!", effect: { ACD: -10 } },
-            { text: "Tech boom fuels rapid growth in JI!", effect: { JI: 12 } }
+            "Tech breakthrough boosts GNL!",
+            "Government contract awarded to JI!",
+            "Stock market shows stable growth.",
+            "Economic uncertainty causes fluctuations.",
+            "Investor confidence skyrockets!",
+            "Regulatory issues affect major stocks.",
+            "GNL announces space colonization plans!",
+            "JI secures major international deal!",
+            "Major cyberattack disrupts market!",
+            "New energy discovery revolutionizes industry!"
         ];
 
-        function speak(text) {
-            const speech = new SpeechSynthesisUtterance(text);
-            speech.lang = 'en-US';
-            speech.volume = 1;
-            speech.rate = 1;
-            speech.pitch = 1;
+        function updateNews() {
+            let headline = headlines[Math.floor(Math.random() * headlines.length)];
+            document.getElementById("headline").innerText = headline;
+            let speech = new SpeechSynthesisUtterance(headline);
             speechSynthesis.speak(speech);
         }
 
-        function updateDisplay() {
-            document.getElementById("day").innerText = day;
-            document.getElementById("money").innerText = money.toFixed(2);
-            document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
-            document.getElementById("ji-price").innerText = stocks.JI.price.toFixed(2);
-            document.getElementById("dc005-price").innerText = stocks.DC005.price.toFixed(2);
-            document.getElementById("percent-change").innerText = `Percent Change: ACD: ${(stocks.ACD.price - stocks.ACD.previousPrice).toFixed(2)}%, JI: ${(stocks.JI.price - stocks.JI.previousPrice).toFixed(2)}%, D&C 005: ${(stocks.DC005.price - stocks.DC005.previousPrice).toFixed(2)}%`;
-
-            updateChart();
-        }
-
-        function buyStock(stock) {
-            if (money >= stocks[stock].price) {
-                money -= stocks[stock].price;
-                stocks[stock].owned++;
-                updateDisplay();
+        function distributeDividends() {
+            let totalDividends = 0;
+            for (let stock in stocks) {
+                totalDividends += stocks[stock].owned * stocks[stock].price * stocks[stock].dividendRate;
             }
-        }
-
-        function sellStock(stock) {
-            if (stocks[stock].owned > 0) {
-                money += stocks[stock].price;
-                stocks[stock].owned--;
-                updateDisplay();
-            }
+            money += totalDividends;
         }
 
         function nextDay() {
             day++;
-
-            let randomNews = headlines[Math.floor(Math.random() * headlines.length)];
-            document.getElementById("news").innerText = randomNews.text;
-            speak(randomNews.text);
-
-            if (randomNews.effect.ACD) stocks.ACD.price += randomNews.effect.ACD;
-            if (randomNews.effect.JI) stocks.JI.price += randomNews.effect.JI;
-
-            stocks.DC005.price = (stocks.ACD.price + stocks.JI.price) / 2;
-
-            stocks.ACD.previousPrice = stocks.ACD.price;
-            stocks.JI.previousPrice = stocks.JI.price;
-            stocks.DC005.previousPrice = stocks.DC005.price;
-
+            distributeDividends();
+            updateNews();
             updateDisplay();
         }
 
-        let ctx = document.getElementById("stockChart").getContext("2d");
-        let stockChart = new Chart(ctx, {
-            type: "line",
-            data: { labels: [], datasets: [{ label: "ACD", borderColor: "blue", data: [] }, { label: "JI", borderColor: "green", data: [] }, { label: "D&C 005", borderColor: "orange", data: [] }] },
-            options: { scales: { x: { title: { display: true, text: 'Day' } }, y: { title: { display: true, text: 'Stock Price ($)' } } } }
-        });
-
-        function updateChart() {
-            stockChart.data.labels.push(day);
-            stockChart.data.datasets.forEach((dataset, index) => dataset.data.push(Object.values(stocks)[index].price));
-            stockChart.update();
-        }
-
-        setInterval(nextDay, 5000); // 5 seconds = 1 day
+        setInterval(nextDay, 5000);
+        updateDisplay();
     </script>
-
 </body>
 </html>
 
