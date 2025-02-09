@@ -88,12 +88,18 @@
             font-size: 18px;
             color: #34495e;
         }
+        .percent-change {
+            font-size: 16px;
+            color: #16a085;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <h1>Stock Market Simulation</h1>
-    <p class="info">Day: <span id="day">1</span> | Money: $<span id="money">100</span></p>
+    <p class="info">Hour: <span id="hour">1</span> | Money: $<span id="money">100</span></p>
+    <p class="percent-change" id="percent-change">Percent Change: 0%</p>
 
     <div class="container">
         <div class="stock-container">
@@ -120,8 +126,9 @@
     <p class="headline" id="headline">No news today.</p>
 
     <script>
-        let day = 1;
+        let hour = 1;
         let money = 100;
+        let initialPrices = { ACD: 10, FFI: 15 };
         let stocks = {
             ACD: { price: 10, owned: 0, history: [], dividendRate: 0.1 },
             FFI: { price: 15, owned: 0, history: [], dividendRate: 0.05 }
@@ -134,16 +141,23 @@
             { text: "Massive government contract for FFI!", effect: { FFI: 10 } },
             { text: "Market crash!", effect: { ACD: -20, FFI: -20 }, rare: true },
             { text: "Massive drought hits chicken production!", effect: { ACD: -15 } },
-            { text: "FFI acquires new fart technology!", effect: { FFI: 8 } }
+            { text: "FFI acquires new fart technology!", effect: { FFI: 8 } },
+            { text: "New chicken farming technique boosts profits!", effect: { ACD: 10 } },
+            { text: "FFI signs partnership with top oil company!", effect: { FFI: 12 } }
         ];
 
         function updateDisplay() {
-            document.getElementById("day").innerText = day;
+            document.getElementById("hour").innerText = hour;
             document.getElementById("money").innerText = money.toFixed(2);
             document.getElementById("acd-price").innerText = stocks.ACD.price.toFixed(2);
             document.getElementById("ffi-price").innerText = stocks.FFI.price.toFixed(2);
             document.getElementById("acd-owned").innerText = stocks.ACD.owned;
             document.getElementById("ffi-owned").innerText = stocks.FFI.owned;
+
+            // Calculate percent change
+            let percentChange = ((stocks.ACD.price - initialPrices.ACD) / initialPrices.ACD) * 100;
+            document.getElementById("percent-change").innerText = `Percent Change: ${percentChange.toFixed(2)}%`;
+
             updateChart();
         }
 
@@ -163,8 +177,10 @@
             }
         }
 
-        function nextDay() {
-            day++;
+        function nextHour() {
+            hour++;
+            if (hour > 24) hour = 1; // Reset to 1 when the day ends
+
             let headlineOptions = headlines.filter(h => !h.rare || Math.random() < 0.001);
             let headline = headlineOptions[Math.floor(Math.random() * headlineOptions.length)];
             document.getElementById("headline").innerText = headline.text;
@@ -203,7 +219,10 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Day'
+                            text: 'Hour'
+                        },
+                        ticks: {
+                            maxTicksLimit: 24
                         }
                     },
                     y: {
@@ -217,15 +236,16 @@
         });
 
         function updateChart() {
-            stockChart.data.labels.push(day);
+            stockChart.data.labels.push(hour);
             stockChart.data.datasets[0].data.push(stocks.ACD.price);
             stockChart.data.datasets[1].data.push(stocks.FFI.price);
             stockChart.update();
         }
 
-        setInterval(nextDay, 10000); // 10 seconds = 1 day
+        setInterval(nextHour, 2000); // 2 seconds = 1 hour
         updateDisplay();
     </script>
 </body>
 </html>
+
 
