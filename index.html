@@ -123,7 +123,7 @@
         <button onclick="buyStock('GNL')">Buy</button>
         <button onclick="sellStock('GNL')">Sell</button>
       </div>
-      <!-- Stock Card: D&C 005 -->
+      <!-- Stock Card: D&C 005 (DC) -->
       <div class="stock" id="stock-DC">
         <h2>D&C 005 - Market Index</h2>
         <p>Price: $<span id="dc-price">20</span></p>
@@ -159,6 +159,42 @@
         <button onclick="buyStock('GPT')">Buy</button>
         <button onclick="sellStock('GPT')">Sell</button>
       </div>
+      <!-- Stock Card: BWC -->
+      <div class="stock" id="stock-BWC">
+        <h2>BWC - Brain Wash Company</h2>
+        <p>Price: $<span id="bwc-price">120</span></p>
+        <p>Owned: <span id="bwc-owned">0</span></p>
+        <p>Total Spent: $<span id="bwc-spent">0</span></p>
+        <button onclick="buyStock('BWC')">Buy</button>
+        <button onclick="sellStock('BWC')">Sell</button>
+      </div>
+      <!-- Stock Card: BADC -->
+      <div class="stock" id="stock-BADC">
+        <h2>BADC - Boom and Doom Company</h2>
+        <p>Price: $<span id="badc-price">30</span></p>
+        <p>Owned: <span id="badc-owned">0</span></p>
+        <p>Total Spent: $<span id="badc-spent">0</span></p>
+        <button onclick="buyStock('BADC')">Buy</button>
+        <button onclick="sellStock('BADC')">Sell</button>
+      </div>
+      <!-- Stock Card: GCC -->
+      <div class="stock" id="stock-GCC">
+        <h2>GCC - Gilded Crown Corporation</h2>
+        <p>Price: $<span id="gcc-price">200</span></p>
+        <p>Owned: <span id="gcc-owned">0</span></p>
+        <p>Total Spent: $<span id="gcc-spent">0</span></p>
+        <button onclick="buyStock('GCC')">Buy</button>
+        <button onclick="sellStock('GCC')">Sell</button>
+      </div>
+      <!-- Stock Card: WMSDF -->
+      <div class="stock" id="stock-WMSDF">
+        <h2>WMSDF - Watkins Middle School Directory Fund</h2>
+        <p>Price: $<span id="wmsdf-price">40</span></p>
+        <p>Owned: <span id="wmsdf-owned">0</span></p>
+        <p>Total Spent: $<span id="wmsdf-spent">0</span></p>
+        <button onclick="buyStock('WMSDF')">Buy</button>
+        <button onclick="sellStock('WMSDF')">Sell</button>
+      </div>
     </div>
     <!-- Chart Container -->
     <div class="chart-container">
@@ -177,39 +213,67 @@
       DC: { price: 20, owned: 0, spent: 0 },
       SCC: { price: 10, owned: 0, spent: 0 },
       CCPC: { price: 18, owned: 0, spent: 0 },
-      GPT: { price: 50, owned: 0, spent: 0 }  // New GPT stock
+      GPT: { price: 50, owned: 0, spent: 0 },
+      BWC: { price: 120, owned: 0, spent: 0 },
+      BADC: { price: 30, owned: 0, spent: 0 },
+      GCC: { price: 200, owned: 0, spent: 0 },
+      WMSDF: { price: 40, owned: 0, spent: 0 }
     };
 
-    // Headlines with text and impacts on specific stocks.
-    // For GPT, some headlines have explicit impacts.
+    /***** Fixed Array of 40 Headlines *****/
     let headlines = [
-      { text: "SCC opens its first international restaurant!", impact: { SCC: 5 } },
-      { text: "New chicken dish goes viral – SCC stock soars.", impact: { SCC: 8 } },
-      { text: "SCC partners with a major fast food chain for expansion.", impact: { SCC: 10 } },
-      { text: "Supply chain disruption leads to increased costs for SCC.", impact: { SCC: -3 } },
-      { text: "JI acquires a leading tech company, boosting its stock.", impact: { JI: 6 } },
-      { text: "JI faces a cyberattack, causing a temporary dip.", impact: { JI: -4 } },
-      { text: "GNL announces breakthrough in space mining technology.", impact: { GNL: 15 } },
-      { text: "GNL faces funding issues delaying its Mars project.", impact: { GNL: -7 } },
-      { text: "Global market stability boosts D&C 005's value.", impact: { DC: 5 } },
-      { text: "D&C 005 dips after global recession fears hit.", impact: { DC: -4 } },
-      { text: "CCPC releases limited-edition plushies, creating buzz.", impact: { CCPC: 10 } },
-      { text: "CCPC's production delay hurts its stock.", impact: { CCPC: -6 } },
-      { text: "AI breakthrough boosts GPT stock.", impact: { GPT: 10 } },
-      { text: "GPT stock dips after controversial AI statement.", impact: { GPT: -8 } },
-      // Rare market crash event (affects every stock)
-      { text: "A global market crash leads to significant drops across the board.", impact: { JI: -10, GNL: -10, DC: -10, SCC: -10, CCPC: -10, GPT: -10 } }
+      { text: "SCC opens its first international restaurant! (Headline 1)", impact: { SCC: 5 } },
+      { text: "New chicken dish goes viral – SCC stock soars. (Headline 2)", impact: { SCC: 8 } },
+      { text: "SCC partners with a major fast food chain for expansion. (Headline 3)", impact: { SCC: 10 } },
+      { text: "Supply chain disruption leads to increased costs for SCC. (Headline 4)", impact: { SCC: -3 } },
+      { text: "JI acquires a leading tech company, boosting its stock. (Headline 5)", impact: { JI: 6 } },
+      { text: "JI faces a cyberattack, causing a temporary dip. (Headline 6)", impact: { JI: -4 } },
+      { text: "GNL announces breakthrough in space mining technology. (Headline 7)", impact: { GNL: 15 } },
+      { text: "GNL faces funding issues delaying its Mars project. (Headline 8)", impact: { GNL: -7 } },
+      { text: "Global market stability boosts D&C 005's value. (Headline 9)", impact: { DC: 5 } },
+      { text: "D&C 005 dips after global recession fears hit. (Headline 10)", impact: { DC: -4 } },
+      { text: "CCPC releases limited-edition plushies, creating buzz. (Headline 11)", impact: { CCPC: 10 } },
+      { text: "CCPC's production delay hurts its stock. (Headline 12)", impact: { CCPC: -6 } },
+      { text: "AI breakthrough boosts GPT stock. (Headline 13)", impact: { GPT: 10 } },
+      { text: "GPT stock dips after controversial AI statement. (Headline 14)", impact: { GPT: -8 } },
+      { text: "BWC expands into new international markets. (Headline 15)", impact: { BWC: 12 } },
+      { text: "BWC faces criticism over unethical experiments. (Headline 16)", impact: { BWC: -7 } },
+      { text: "BADC unveils a revolutionary bomb design. (Headline 17)", impact: { BADC: 10 } },
+      { text: "BADC experiences technical failures during testing. (Headline 18)", impact: { BADC: -10 } },
+      { text: "GCC dazzles investors with its luxurious branding. (Headline 19)", impact: { GCC: 8 } },
+      { text: "GCC's price remains high due to market hype. (Headline 20)", impact: { GCC: 5 } },
+      { text: "WMSDF surprises analysts with unexpected growth. (Headline 21)", impact: { WMSDF: 7 } },
+      { text: "WMSDF sees a sharp decline amid budget cuts. (Headline 22)", impact: { WMSDF: -5 } },
+      { text: "Investor confidence soars after positive earnings reports. (Headline 23)", impact: { JI: 4, CCPC: 4 } },
+      { text: "Breakthrough in renewable energy lifts tech stocks. (Headline 24)", impact: { JI: 5, GNL: 5 } },
+      { text: "Merger rumors spark excitement in the market. (Headline 25)", impact: { JI: 2, GPT: 2, GCC: 2 } },
+      { text: "New market trends drive a surge in consumer stocks. (Headline 26)", impact: { SCC: 4, CCPC: 4 } },
+      { text: "Unexpected geopolitical events shake investor confidence. (Headline 27)", impact: { GNL: -5, BADC: -5 } },
+      { text: "Celebrity endorsement sends CCPC stock skyrocketing. (Headline 28)", impact: { CCPC: 7 } },
+      { text: "Economic data reveals strong growth, boosting overall market. (Headline 29)", impact: { JI: 2, GNL: 2, SCC: 2, CCPC: 2, GPT: 2, BWC: 2, BADC: 2, GCC: 2, WMSDF: 2 } },
+      { text: "Regulatory reforms bring stability to the market. (Headline 30)", impact: { DC: 5, JI: 2, GNL: 2 } },
+      { text: "Technological innovation drives a surge in AI stocks. (Headline 31)", impact: { GPT: 6 } },
+      { text: "Global trade talks ease tensions, lifting investor mood. (Headline 32)", impact: { GNL: 3, DC: 3 } },
+      { text: "Environmental initiatives boost green energy companies. (Headline 33)", impact: { JI: 3, GNL: 3 } },
+      { text: "New breakthrough in quantum computing propels JI stock upward. (Headline 34)", impact: { JI: 7 } },
+      { text: "GNL's innovative project receives major international funding. (Headline 35)", impact: { GNL: 8 } },
+      { text: "BWC achieves a scientific milestone, boosting investor confidence. (Headline 36)", impact: { BWC: 9 } },
+      { text: "BADC faces recall after safety issues, sending stock into freefall. (Headline 37)", impact: { BADC: -9 } },
+      { text: "WMSDF secures new contracts with local institutions, driving growth. (Headline 38)", impact: { WMSDF: 6 } },
+      { text: "GCC unveils a new luxury product line, exciting high-end investors. (Headline 39)", impact: { GCC: 7 } },
+      { text: "WMSDF's community initiative sparks unexpected upward momentum. (Headline 40)", impact: { WMSDF: 5 } }
     ];
+    // (Optionally, you could include a rare market crash headline as part of these if desired.)
 
     /***** Custom GPT Price Update Logic *****/
     function updateGPTStockPrice(news) {
       let prevPrice = stocks.GPT.price;
-      // Use the GPT impact if provided; otherwise, default to 0.
       let headlineImpact = (news.impact && news.impact.GPT) ? news.impact.GPT : 0;
-      // Generate a random component between -5 and 5.
       let randomComponent = Math.floor(Math.random() * 11) - 5;
-      // New GPT price: 50% from headline impact (and previous value) and 50% random.
       let newPrice = prevPrice + 0.5 * (headlineImpact + randomComponent);
+      if (newPrice < 3 && Math.random() < 0.5) {
+        newPrice += Math.floor(Math.random() * 5) + 1;
+      }
       if (newPrice < 0) newPrice = 0;
       return newPrice;
     }
@@ -224,7 +288,11 @@
         { label: 'D&C 005', data: [stocks.DC.price], borderColor: 'green', fill: false },
         { label: 'SCC - Shashwat Curry Company', data: [stocks.SCC.price], borderColor: 'red', fill: false },
         { label: 'CCPC - Carly Cute Plushy Company', data: [stocks.CCPC.price], borderColor: 'purple', fill: false },
-        { label: 'GPT - AI Stock', data: [stocks.GPT.price], borderColor: 'magenta', fill: false }
+        { label: 'GPT - AI Stock', data: [stocks.GPT.price], borderColor: 'magenta', fill: false },
+        { label: 'BWC - Brain Wash Company', data: [stocks.BWC.price], borderColor: 'darkblue', fill: false },
+        { label: 'BADC - Boom and Doom Company', data: [stocks.BADC.price], borderColor: 'darkred', fill: false },
+        { label: 'GCC - Gilded Crown Corporation', data: [stocks.GCC.price], borderColor: 'gold', fill: false },
+        { label: 'WMSDF - Watkins Middle School Directory Fund', data: [stocks.WMSDF.price], borderColor: 'teal', fill: false }
       ]
     };
     let chartOptions = {
@@ -248,18 +316,30 @@
       document.getElementById('scc-price').innerText = stocks.SCC.price;
       document.getElementById('ccpc-price').innerText = stocks.CCPC.price;
       document.getElementById('gpt-price').innerText = stocks.GPT.price;
+      document.getElementById('bwc-price').innerText = stocks.BWC.price;
+      document.getElementById('badc-price').innerText = stocks.BADC.price;
+      document.getElementById('gcc-price').innerText = stocks.GCC.price;
+      document.getElementById('wmsdf-price').innerText = stocks.WMSDF.price;
       document.getElementById('ji-owned').innerText = stocks.JI.owned;
       document.getElementById('gnl-owned').innerText = stocks.GNL.owned;
       document.getElementById('dc-owned').innerText = stocks.DC.owned;
       document.getElementById('scc-owned').innerText = stocks.SCC.owned;
       document.getElementById('ccpc-owned').innerText = stocks.CCPC.owned;
       document.getElementById('gpt-owned').innerText = stocks.GPT.owned;
+      document.getElementById('bwc-owned').innerText = stocks.BWC.owned;
+      document.getElementById('badc-owned').innerText = stocks.BADC.owned;
+      document.getElementById('gcc-owned').innerText = stocks.GCC.owned;
+      document.getElementById('wmsdf-owned').innerText = stocks.WMSDF.owned;
       document.getElementById('ji-spent').innerText = stocks.JI.spent;
       document.getElementById('gnl-spent').innerText = stocks.GNL.spent;
       document.getElementById('dc-spent').innerText = stocks.DC.spent;
       document.getElementById('scc-spent').innerText = stocks.SCC.spent;
       document.getElementById('ccpc-spent').innerText = stocks.CCPC.spent;
       document.getElementById('gpt-spent').innerText = stocks.GPT.spent;
+      document.getElementById('bwc-spent').innerText = stocks.BWC.spent;
+      document.getElementById('badc-spent').innerText = stocks.BADC.spent;
+      document.getElementById('gcc-spent').innerText = stocks.GCC.spent;
+      document.getElementById('wmsdf-spent').innerText = stocks.WMSDF.spent;
     }
     function updateGraph() {
       chartData.labels.push(`Day ${day}`);
@@ -269,29 +349,37 @@
       chartData.datasets[3].data.push(stocks.SCC.price);
       chartData.datasets[4].data.push(stocks.CCPC.price);
       chartData.datasets[5].data.push(stocks.GPT.price);
+      chartData.datasets[6].data.push(stocks.BWC.price);
+      chartData.datasets[7].data.push(stocks.BADC.price);
+      chartData.datasets[8].data.push(stocks.GCC.price);
+      chartData.datasets[9].data.push(stocks.WMSDF.price);
       stockChart.update();
     }
 
     /***** Simulated API Call for Price Update *****/
-    // For every stock except GPT and DC, apply news impact and random volatility.
-    // For GPT, use the custom updateGPTStockPrice() logic.
-    // For DC, compute the average of all other stocks.
     function fetchPriceUpdate(news) {
       return new Promise(resolve => {
         setTimeout(() => {
           let newPrices = {};
-          // Process stocks other than DC.
           Object.keys(stocks).forEach(stock => {
             if (stock === "DC") {
-              // We'll compute DC after processing others.
-              return;
+              return; // Compute later.
             } else if (stock === "GPT") {
               newPrices[stock] = updateGPTStockPrice(news);
             } else {
               let impact = news.impact[stock] || 0;
-              let randomVolatility = Math.floor(Math.random() * 3) - 1; // -1, 0, or 1
-              newPrices[stock] = stocks[stock].price + impact + randomVolatility;
-              if (newPrices[stock] < 0) newPrices[stock] = 0;
+              let randomVolatility;
+              if (stock === "GCC" || stock === "WMSDF") {
+                randomVolatility = Math.floor(Math.random() * 7) - 3; // -3 to 3 for bumpy stocks
+              } else {
+                randomVolatility = Math.floor(Math.random() * 3) - 1; // -1 to 1 for others
+              }
+              let updatedPrice = stocks[stock].price + impact + randomVolatility;
+              if (updatedPrice < 0) updatedPrice = 0;
+              if (updatedPrice < 3 && Math.random() < 0.5) {
+                updatedPrice += Math.floor(Math.random() * 5) + 1;
+              }
+              newPrices[stock] = updatedPrice;
             }
           });
           // Compute DC as the average of all other stocks' new prices.
@@ -311,19 +399,14 @@
 
     /***** News and Price Update with Text-to-Speech *****/
     async function applyNews() {
-      // Choose a random news event.
       let news = headlines[Math.floor(Math.random() * headlines.length)];
-      // Check for a rare market crash event (1/10000 chance).
       if (Math.random() < 0.0001) {
         news = headlines.find(h => h.text.includes("market crash"));
       }
-      // Display the news headline.
       document.getElementById('headline').innerText = news.text;
-      // Cancel any ongoing speech and speak the current headline.
       speechSynthesis.cancel();
       let utterance = new SpeechSynthesisUtterance(news.text);
       speechSynthesis.speak(utterance);
-      // Update prices via the simulated API.
       let newPrices = await fetchPriceUpdate(news);
       Object.keys(newPrices).forEach(stock => {
         stocks[stock].price = newPrices[stock];
@@ -368,15 +451,13 @@
 
     /***** Scroll Buttons for Stock List *****/
     function scrollUp() {
-      let container = document.getElementById('stockList');
-      container.scrollBy({ top: -50, behavior: 'smooth' });
+      document.getElementById('stockList').scrollBy({ top: -50, behavior: 'smooth' });
     }
     function scrollDown() {
-      let container = document.getElementById('stockList');
-      container.scrollBy({ top: 50, behavior: 'smooth' });
+      document.getElementById('stockList').scrollBy({ top: 50, behavior: 'smooth' });
     }
 
-    /***** Save/Load Game Feature (Graph Data Saved as Well) *****/
+    /***** Save/Load Game Feature (Including Graph Data) *****/
     function saveGame() {
       const gameState = {
         day,
@@ -408,8 +489,6 @@
   </script>
 </body>
 </html>
-
-
 
 
 
